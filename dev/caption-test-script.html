@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roteiro de teste — legendas (Mau + Laura)</title>
+<style>
+  :root {
+    --mau: #2563eb;
+    --laura: #db2777;
+    --pause: #b45309;
+    --bg: #0f1115;
+    --card: #171a21;
+    --ink: #e6e8ee;
+    --muted: #9aa3b2;
+    --line: #262b36;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2rem 1rem 4rem;
+    background: var(--bg); color: var(--ink);
+    font: 17px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 1.7rem; margin: 0 0 .3rem; }
+  .sub { color: var(--muted); margin: 0 0 2rem; }
+  .phase {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 1.1rem 1.3rem; margin: 1rem 0;
+  }
+  .phase h2 { font-size: 1.15rem; margin: 0 0 .2rem; }
+  .phase .goal { color: var(--muted); font-size: .9rem; margin: 0 0 .8rem; }
+  .star { color: #f5c518; }
+  .line { margin: .55rem 0; padding-left: .9rem; border-left: 3px solid var(--line); }
+  .who { font-weight: 700; }
+  .mau .who { color: var(--mau); }
+  .laura .who { color: var(--laura); }
+  .mau { border-left-color: var(--mau); }
+  .laura { border-left-color: var(--laura); }
+  .say { color: var(--ink); }
+  .note { font-style: italic; color: var(--muted); }
+  .pause {
+    display: inline-block; margin: .5rem 0; padding: .15rem .6rem;
+    background: rgba(180,83,9,.15); color: var(--pause);
+    border: 1px solid rgba(180,83,9,.4); border-radius: 999px;
+    font-size: .85rem; font-weight: 600;
+  }
+  .callout {
+    background: rgba(37,99,235,.1); border: 1px solid rgba(37,99,235,.4);
+    border-radius: 12px; padding: 1rem 1.2rem; margin: 1.5rem 0;
+  }
+  .callout.crit { background: rgba(245,197,24,.08); border-color: rgba(245,197,24,.45); }
+  ol { padding-left: 1.2rem; }
+  code { background: #0b0d11; padding: .1rem .4rem; border-radius: 5px; font-size: .9em; }
+  .legend { display: flex; gap: 1.2rem; flex-wrap: wrap; margin: 0 0 1.5rem; font-size: .9rem; }
+  .legend span { display: inline-flex; align-items: center; gap: .4rem; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  hr { border: none; border-top: 1px solid var(--line); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Roteiro de teste — legendas do Google Meet</h1>
+  <p class="sub">Mau + Laura · sigam as falas na ordem. Leva ~3 minutos.</p>
+
+  <div class="legend">
+    <span><span class="dot" style="background:var(--mau)"></span> fala do <b>Mau</b></span>
+    <span><span class="dot" style="background:var(--laura)"></span> fala da <b>Laura</b></span>
+    <span><span class="pause" style="margin:0">⏸ pausa</span> os dois em silêncio</span>
+  </div>
+
+  <div class="callout">
+    <b>Antes de começar</b>
+    <ol>
+      <li>Os dois entram na <b>mesma chamada</b> do Meet.</li>
+      <li>Ativem as legendas: tecla <code>c</code>, idioma <b>Português</b>.</li>
+      <li>O Mau prepara a captura (parte técnica dele).</li>
+      <li>A <span class="pause" style="margin:0">⏸ pausa</span> é importante — é o silêncio que separa um turno do outro. Respeitem os segundos.</li>
+    </ol>
+  </div>
+
+  <section class="phase">
+    <h2>Fase 1 — Fala individual</h2>
+    <p class="goal">Confirma que o Meet mostra o nome de quem fala.</p>
+    <div class="line mau"><span class="who">Mau:</span> <span class="say">“Teste um. Aqui é o Mau falando sozinho.”</span></div>
+    <div class="pause">⏸ 3s de silêncio</div>
+    <div class="line laura"><span class="who">Laura:</span> <span class="say">“Teste dois. Aqui é a Laura falando sozinha.”</span></div>
+    <div class="pause">⏸ 3s de silêncio</div>
+  </section>
+
+  <section class="phase">
+    <h2>Fase 2 — Alternância rápida</h2>
+    <p class="goal">Troca de quem fala, indo e voltando rápido.</p>
+    <div class="line mau"><span class="who">Mau:</span> <span class="say">“Laura, você me ouve?”</span></div>
+    <div class="line laura"><span class="who">Laura:</span> <span class="say">“Ouço sim, Mau.”</span></div>
+    <div class="line mau"><span class="who">Mau:</span> <span class="say">“Ótimo, vamos continuar.”</span></div>
+    <div class="line laura"><span class="who">Laura:</span> <span class="say">“Combinado.”</span></div>
+    <div class="pause">⏸ 3s de silêncio</div>
+  </section>
+
+  <section class="phase">
+    <h2>Fase 3 — Fala simultânea <span class="star">⭐</span></h2>
+    <p class="goal">Os dois falam <b>ao mesmo tempo</b> por ~5 segundos. Comecem juntos, na contagem de 3.</p>
+    <div class="line mau"><span class="who">Mau:</span> <span class="say">“Um, dois, três, quatro, cinco, seis, sete, oito.”</span></div>
+    <div class="line laura"><span class="who">Laura:</span> <span class="say">“Segunda, terça, quarta, quinta, sexta, sábado, domingo.”</span></div>
+    <p class="note">Falem por cima um do outro de verdade — é o ponto mais importante do teste.</p>
+    <div class="pause">⏸ 3s de silêncio</div>
+  </section>
+
+  <section class="phase">
+    <h2>Fase 4 — Pausa no meio da fala <span class="star">⭐</span></h2>
+    <p class="goal">Começar uma frase, parar no meio, e continuar a MESMA frase depois.</p>
+    <div class="line mau"><span class="who">Mau:</span> <span class="say">“Esta frase começa agora…”</span></div>
+    <div class="pause">⏸ 4s — silêncio total, sem completar</div>
+    <div class="line mau"><span class="who">Mau (continua):</span> <span class="say">“…e termina depois de uma pausa longa.”</span></div>
+    <div class="pause">⏸ 3s de silêncio</div>
+    <div class="line laura"><span class="who">Laura:</span> <span class="say">“A Laura também começa uma ideia…”</span></div>
+    <div class="pause">⏸ 4s — silêncio total, sem completar</div>
+    <div class="line laura"><span class="who">Laura (continua):</span> <span class="say">“…e conclui depois de parar no meio.”</span></div>
+    <div class="pause">⏸ 3s de silêncio</div>
+  </section>
+
+  <section class="phase">
+    <h2>Fase 5 — Monólogo longo</h2>
+    <p class="goal">Laura fala frases seguidas, <b>sem pausas longas</b> entre elas.</p>
+    <div class="line laura"><span class="who">Laura:</span> <span class="say">“Agora eu vou falar várias frases seguidas. Esta é a primeira. Esta é a segunda. Esta é a terceira. E esta é a última do monólogo.”</span></div>
+    <div class="pause">⏸ 3s de silêncio</div>
+  </section>
+
+  <section class="phase">
+    <h2>Fase 6 — Encerrar</h2>
+    <p class="goal">O Mau finaliza a captura (parte técnica dele). Fim!</p>
+  </section>
+
+  <div class="callout crit">
+    <b>⭐ O ponto crítico é a Fase 3.</b> Sobreponham as vozes de verdade — comecem juntos no “3”.
+    É a única forma de forçar o Meet a mostrar duas legendas ao mesmo tempo, que é o que
+    a gente quer testar.
+  </div>
+</main>
+</body>
+</html>
