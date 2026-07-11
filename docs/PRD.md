@@ -5,10 +5,6 @@ audio) and, every couple of minutes, asks an LLM for an analysis — topics and 
 spent, time alerts, contradictions and loose ends, decisions, suggested questions,
 and what changed since the last analysis.
 
-Successor to `meeting-companion` (the "original"), which captured mic + speaker
-loopback and transcribed locally with Whisper/voxtype. This project replaces that
-entire audio pipeline with Meet's own captions.
-
 ```
 Bookmarklet (clicked once per call on meet.google.com)
   MutationObserver on the captions DOM
@@ -25,108 +21,106 @@ picked up automatically.
 
 Everything runs locally except the LLM call.
 
-## Why this over the original
+## Why captions, not audio
 
-Meet captions hand us, for free, the two things that were the original's whole
-hard part:
+Meet captions hand us, for free, the two hardest parts of an audio pipeline:
 
-- **Real speaker names.** Meet labels each caption with the participant. The
-  original could only say `you`/`remote`; here we get true diarization for nothing.
-- **No local ML / GPU / audio deps.** parec, ffmpeg, voxtype, 30s chunking,
-  hallucination filtering — all gone. What remains is a bookmarklet, a small
-  HTTP server, and the analysis loop (largely unchanged from the original).
+- **Real speaker names.** Meet labels each caption with the participant, giving
+  true diarization for nothing (`"You"` for the local user).
+- **No local ML / GPU / audio deps.** No speech-to-text model, GPU, or
+  audio-capture pipeline to run — just a bookmarklet, a small HTTP server, and the
+  analysis loop.
 
 ## Goals
 
 1. Capture Meet captions live, with speaker names, handling in-place updates.
 2. Persist a running transcript per meeting.
-3. Run the original's analysis loop against that transcript via the `claude` /
-   `opencode` CLI.
+3. Run the analysis loop against that transcript via the `claude` / `opencode` CLI.
 4. Serve a side-by-side page (transcript left, analysis right) at `localhost:8737`.
 
 ## Non-goals
 
-- No audio capture / local ASR of any kind (dropped deliberately).
+- No audio capture / local ASR of any kind.
 - No verbatim minutes — captions are lossy; this is a copilot, not a court record.
-- No cloud service, no auth, no multi-user. Single local user, one meeting per port.
-- No forcing captions on — user enables them (documented step).
+- No cloud service, no auth, no multi-user. Single local user.
+- No forcing captions on — the user enables them (documented step).
 
 ## Decisions (locked)
 
 | Area | Choice | Note |
 |---|---|---|
-| Capture | Meet captions only | Audio pipeline dropped entirely |
-| Server | Node.js, stdlib `http` only | No framework; one language would-be nice but server stays dep-free |
-| LLM | shell out to `claude` / `opencode` CLI | Same as original; no API key to manage |
-| UI refresh | browser polls `GET /m/<id>/state` | Lazy default; SSE only if polling proves twitchy |
+| Capture | Meet captions only | No audio pipeline |
+| Server | Node.js, stdlib `http` only | No framework, dep-free |
+| LLM | shell out to `claude` / `opencode` CLI | No API key to manage |
+| UI refresh | browser polls `GET /m/<id>/state` | SSE only if polling proves twitchy |
 | Session model | one long-lived server, keyed by Meet code | Tracks many meetings at once; `node server.js [claude\|opencode]`, no title arg |
 
 ## Components
 
 ### 1. Bookmarklet (self-contained inline blob)
 
-Delivery mechanism decided in [ADR-0001](adr/0001-caption-delivery-mechanism.md)
-(bookmarklet over MV3 extension; a server-loaded `<script>` is impossible under
-Meet's Trusted Types, `fetch+eval` parked).
+Delivery mechanism decided in [ADR-0001](adr/0001-caption-delivery-mechanism.md):
+a self-contained inline bookmarklet, chosen over an MV3 extension and over
+server-loaded `<script>` / `fetch+eval` approaches (blocked by Meet's Trusted
+Types + CSP).
 
 - Clicked **once per call** after captions are on (`c`). No auto-injection, no
-  manifest, no permissions review — the whole MV3 scaffold is gone.
+  manifest, no permissions review.
 - A `MutationObserver` watches the captions region; each caption item is tagged via
   `WeakMap<Element,id>` and POSTed as an upsert as its text grows (see Hard
   Problems #2 for the model).
 - Reads the **Meet code** from `location.pathname` and the **title** from
   `document.title`; both ride on every POST.
-- **Identity (per-item id) lives here, not in the server** (see Hard Problems).
+- **Per-item identity lives here, not in the server** (see Hard Problems #2).
 - Transport: `fetch('http://localhost:8737/caption', {method:'POST', body:JSON})`.
-  HTTPS→`http://localhost` is permitted (localhost is treated as trustworthy).
-  First run per origin, Chrome prompts once for **Local Network Access** ("Allow");
-  granted, it persists — a documented one-time step, like enabling captions.
-  Failed POST (server down) is dropped silently — no buffering (YAGNI until it hurts).
+  On first use per origin, Chrome prompts once for **Local Network Access**
+  ("Allow"); granted, it persists — a documented one-time step, like enabling
+  captions. A failed POST (server down) is dropped silently — no buffering.
 - No popup (a bookmarklet has none); the server URL is baked into the blob.
-- Self-contained (~1 KB minified); no server-loaded code. Keep the readable source
-  in the repo (`bookmarklet.src.js`), minify to the `javascript:` blob on build.
-  All DOM selectors up top so a Meet DOM change is a one-line edit + re-minify.
+- Self-contained (~1 KB minified); no server-loaded code. Readable source in the
+  repo (`bookmarklet.src.js`), minified to the `javascript:` blob on build. All DOM
+  selectors up top so a Meet DOM change is a one-line edit + re-minify.
 
 ### 2. Node server (`server.js`, stdlib only)
 
-- Keeps `Map<meetingId, session>`; a session is created on first `POST /caption`
+- Keeps `Map<meetingId, session>`; a session is created on first `POST /m/<id>/caption`
   for a code.
-- `POST /caption` — upsert `{meetingId, title, id, speaker, text, seq}` into that
-  session's ordered Map.
+- `POST /m/<id>/caption` — upsert `{title, id, speaker, text, seq}` into that
+  session's ordered Map. `meetingId` comes from the path, not the body.
 - `GET /` — lists active meetings (link to each `/m/<id>`).
 - `GET /m/<id>` — serves a **constant** HTML+JS shell, identical bytes for every
   `<id>`. No server-side rendering: `<id>` never appears in the HTML, only in the
-  URL the shell's JS polls. So this route ignores `<id>` and returns one fixed
-  string (the ported `index.html`, read once at startup or inlined).
+  URL the shell's JS polls. The route ignores `<id>` and returns one fixed string
+  (the page shell — see Component 3, read once at startup or inlined).
 - `GET /m/<id>/state` — JSON `{title, transcript, analysis, updatedAt}` for polling.
-- **CORS for the bookmarklet:** `POST /caption` comes cross-origin from
-  `https://meet.google.com`, so respond with `Access-Control-Allow-Origin: *`,
-  `Access-Control-Allow-Headers: Content-Type`, `Access-Control-Allow-Methods:
-  POST, OPTIONS`, and answer the `OPTIONS` preflight with `204`. ~6 lines. (No
-  `Allow-Private-Network` header — verified inert on current Chrome; the gate is
-  the client-side one-time LNA prompt, not a server header. See ADR-0001.)
-
-All routes share one `<id>` parser — a single
-`req.url.match(/^\/m\/([^/]+)(\/state)?$/)` plus a couple of `if`s on `req.url`,
-not a route table or framework (stdlib `http` only).
+- **CORS:** `POST /m/<id>/caption` is cross-origin from `https://meet.google.com`, so
+  respond with `Access-Control-Allow-Origin: *`, `Access-Control-Allow-Headers:
+  Content-Type`, `Access-Control-Allow-Methods: POST, OPTIONS`, and answer the
+  `OPTIONS` preflight with `204`. No `Allow-Private-Network` header (see ADR-0001).
+  ~6 lines.
+- All routes share one `<id>` parser — a single
+  `req.url.match(/^\/m\/([^/]+)(\/caption|\/state)?$/)` plus a couple of `if`s on `req.url`,
+  not a route table or framework (stdlib `http` only).
 - Writes `meetings/<date>-<id>/transcript.txt` and `analysis.txt` (`meetings/`
   git-ignored). Date in the dir since recurring Meet codes repeat across days;
   in-memory session keys on `id` alone (one live at a time).
 - **Analysis loop:** one `setInterval(ANALYZE_EVERY)` per session; if that
   session's transcript changed since last run, spawn the CLI with the prompt **on
-  stdin** (avoids ARG_MAX on long transcripts), write to its `analysis.txt`. An
-  empty reply must not clobber the last good analysis (ported guard).
+  stdin** (avoids ARG_MAX on long transcripts) and write its `analysis.txt`. An
+  empty reply must not clobber the last good analysis.
 
 ### 3. The page (`index.html`)
 
-- Ports from the original: transcript left, analysis (markdown) right.
-- **Static shell, client-derived id.** The same HTML served for every meeting;
-  the JS reads `<id>` from `location.pathname` (same trick the extension uses on
-  the Meet side) and builds its own `/m/<id>/state` URL.
-- Polls that `/state` every ~2s. `ponytail:` re-render is gated on `updatedAt` —
-  skip it when unchanged (idle call → no work; analysis is byte-identical between
-  the ~120s runs). Ceiling: full transcript re-render on a long call; upgrade path
-  is a `seq` high-water cursor + append, only if the tail ever janks.
+- **Two columns, full height.** Transcript left (dark, monospace, `white-space:
+  pre-wrap`; autoscroll only when already at the bottom), analysis right (light,
+  markdown rendered via a small library, e.g. `marked` from a CDN). A header shows
+  the meeting `title` and the last-analysis time (both from `/state`).
+- **Static shell, client-derived id.** The same HTML served for every meeting; the
+  JS reads `<id>` from `location.pathname` and builds its own `/m/<id>/state` URL.
+- Polls `/state` every ~2s. `ponytail:` re-render is gated on `updatedAt` — skip it
+  when unchanged (idle call → no work; analysis is byte-identical between the ~120s
+  runs). Ceiling: full transcript re-render on a long call; upgrade path is a `seq`
+  high-water cursor + append, only if the tail ever janks.
 
 ## Data model
 
@@ -152,9 +146,9 @@ stays structured (not a flat pre-rendered line) because upsert replaces by `id`.
 
 Two layers.
 
-**In-memory** (`Map<meetingId, session>`, lost on exit): `meetingId`, `title`, the
-ordered utterance map (`{id, seq, speaker, text, ts}` per row), the last analysis
-text + `updatedAt`, and the analysis loop's bookkeeping (last transcript size seen).
+**In-memory** (`Map<meetingId, session>`, lost on exit), per session: `meetingId`,
+`title`, the ordered utterance map (see Data model), the last analysis text +
+`updatedAt`, and the analysis loop's bookkeeping (last transcript size seen).
 
 **On-disk**, under `meetings/<date>-<id>/` (**git-ignored**, kept forever — never
 pruned):
@@ -163,26 +157,24 @@ pruned):
 - `analysis.txt` — latest good LLM analysis (markdown).
 
 No `meeting.json` in v1. Every field it would hold is already available without
-storing it: `meetingId`/`url` from the dirname, `title` from the transcript
-header (or `/state`), `llm` from the launch arg, `participants` as
-`[...new Set(speakers)]` derived from the transcript at read time. It's a cache
-of things we already have — write it when a *reader* exists (the deferred
-Calendar/index feature, see Future ideas), not before.
+storing it: `meetingId`/`url` from the dirname, `title` from the transcript header
+(or `/state`), `llm` from the launch arg, `participants` as
+`[...new Set(speakers)]` derived from the transcript at read time. Write it when a
+*reader* exists (the deferred Calendar/index feature, see Future ideas), not before.
 
 **Metadata sources — what's free vs what isn't:**
 
-- *Free from the transcript* (no extra scraping): id, title, url, timestamps,
-  and participants **as distinct caption speakers** — all derivable from what
-  we already capture.
-- *Not worth scraping for v1 — full roster incl. silent attendees:* would need
-  the participants panel, a second obfuscated Meet DOM anchor with its own
-  join/leave churn, to add names the analysis never uses (it reasons over the
-  transcript; silent attendees contribute no lines). Easy follow-up if a reader
-  ever needs it — not by scraping unless it earns its keep.
+- *Free from the transcript* (no extra scraping): id, title, url, timestamps, and
+  participants **as distinct caption speakers** — all derivable from what we
+  already capture.
+- *Not worth scraping for v1 — full roster incl. silent attendees:* would need the
+  participants panel, a second obfuscated Meet DOM anchor with its own join/leave
+  churn, to add names the analysis never uses (it reasons over the transcript;
+  silent attendees contribute no lines). Easy follow-up if a reader ever needs it.
 - *Not on the Meet page at all — Calendar only:* subject/agenda, invite
   description, attendee **emails**, organizer, scheduled start/end. These require
-  Google Calendar integration (extra permission + real work) and are **deferred
-  to future** (see Future ideas), not blocking v1.
+  Google Calendar integration (extra permission + real work) and are **deferred to
+  Future ideas**, not blocking v1.
 
 Not stored: no audio (there is none), no interim caption history (upsert-by-id keeps
 only each item's latest text, which converges to the finalized turn).
@@ -190,14 +182,16 @@ only each item's latest text, which converges to the finalized turn).
 The flat files are the source of truth. Any future index (see Future ideas) is a
 *derived* artifact rebuildable from them, so it doesn't constrain v1.
 
-Both of the below were **verified empirically** against a live **two-participant**
-Meet call (probe + `MutationObserver` via Chrome DevTools; PT-BR test script in
-`dev/`), and the selector strategy cross-checked against a shipping reference
-extension (`google-meet-cc-to-srt`, v3.8.9). The two former Open Questions are now
-resolved; findings folded in here. **Step-by-step DOM behavior with the recorded
+## Hard Problems
+
+DOM behavior is verified against a live **two-participant** Meet call (probe +
+`MutationObserver` via Chrome DevTools; PT-BR test script in `dev/`), with the
+selector strategy cross-checked against a shipping reference extension
+([`google-meet-cc-to-srt`](https://github.com/yunho0130/google-meet-cc-to-srt),
+v3.8.9). **Step-by-step DOM behavior with the recorded
 timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
 
-1. **Caption DOM is fragile / obfuscated.** Confirmed anchor: the captions live in
+1. **Caption DOM is fragile / obfuscated.** The captions live in
    `[role="region"][aria-label*="caption" i]`. Use a **layered selector list** in
    `bookmarklet.src.js`, first match wins:
    - `[role="region"][aria-label*="caption" i]` — primary (English UI).
@@ -209,42 +203,42 @@ timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
    primary; a class-free fallback (region child with an avatar `<img>`, then
    `innerText.split('\n')` → `[speaker, ...text]`) survives a class rename. Keep an
    **exclude list** (`[role="dialog"]`, `button`, mute/camera controls) so the
-   observer ignores non-caption UI. All of it in `bookmarklet.src.js`; one-file maintenance.
+   observer ignores non-caption UI. All of it in `bookmarklet.src.js`; one-file
+   maintenance.
 
-2. **Update-vs-append + rolling window (the actual hard part).** Verified behavior:
+2. **Update-vs-append + rolling window (the actual hard part).** Meet's behavior:
    - Each **caption item is one speaker turn** — a stable element that grows text in
      place across multiple sentences *and* multi-second pauses; a new item starts on
      **speaker change**, not on pause. (A long uninterrupted turn = one long item =
      one transcript line with a single start-`ts`; fine for v1.)
    - Items **accumulate append-only** in the DOM (a rolling history — 17 lines seen
-     coexisting), each frozen once finalized. **No interim→final element swap and no
-     duplicates** observed (17 clean distinct final lines).
-   - **Concurrent speakers → multiple items grow simultaneously** (confirmed: two
-     items updating at once during overlapping speech).
+     coexisting), each frozen once finalized. No interim→final element swap and no
+     duplicates (17 clean distinct final lines).
+   - **Concurrent speakers → multiple items grow simultaneously** (two items
+     updating at once during overlapping speech).
 
-   So the item element is a clean, stable identity — the original plan holds, keyed
-   on the **item element**: tag each `.nMcdL.bj4p3b` via `WeakMap<Element,id>`; on
-   mutation, upsert `{id, speaker, text}` (the item's full current text) to the
-   server, which **just replaces by id**. Item grows → same id → text replaced;
-   freezes → last text sticks; new turn → new item → new id. Concurrent speakers
-   fall out for free (independent items). **No debounce, no dedup, no server-side
-   fuzzy-merge** — the element *is* the identity (the reference extension needs those
-   only because it buffers lines for file export; we stream to a hold-latest-per-id
-   server). Live word-by-word growth is preserved; coalesce per-item POSTs with a
-   light ~400ms trailing debounce purely to cut transport chatter, not for identity.
+   So the item element is a clean, stable identity, keyed on the **item element**:
+   tag each `.nMcdL.bj4p3b` via `WeakMap<Element,id>`; on mutation, upsert
+   `{id, speaker, text}` (the item's full current text) to the server, which **just
+   replaces by id**. Item grows → same id → text replaced; freezes → last text
+   sticks; new turn → new item → new id. Concurrent speakers fall out for free
+   (independent items). **No debounce, no dedup, no server-side fuzzy-merge** — the
+   element *is* the identity. Per-item POSTs are coalesced with a light ~400ms
+   trailing debounce purely to cut transport chatter, not for identity; live
+   word-by-word growth is preserved.
 
-   Residual low risks, documented not built for: an unhit condition that swaps an
-   item element would dupe → content-dedup is the cheap fallback if it ever appears;
-   the append-only history is dropped by Meet eventually → irrelevant, we persist
-   server-side under each id.
+   *Known limitations (documented, not built for):* an unhit condition that swaps an
+   item element would produce a duplicate → content-dedup is the cheap fallback if
+   it ever appears; Meet eventually drops old items from its append-only history →
+   irrelevant, we persist server-side under each id.
 
 3. **Captions off by default.** Documented user step: enable captions (CC / `c`),
    pick language, *then* click the bookmarklet. If it finds no caption region it
    `console.warn`s a hint (no popup to show it in).
 
-4. **No caption timestamps.** Server stamps arrival time on receipt (bookmarklet
-   omits it — keeps the blob small); good enough for the analysis's "time per
-   topic" heuristic.
+4. **No caption timestamps.** Meet exposes none; the server stamps arrival time on
+   receipt (the bookmarklet omits it, keeping the blob small). Good enough for the
+   analysis's "time per topic" heuristic. This is the `ts` field — see Data model.
 
 ## Configuration
 
@@ -257,12 +251,38 @@ timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
 
 Meeting id and title come from the bookmarklet per-POST — no server-side title arg.
 
-Analysis prompt: port the original's PT-BR prompt verbatim (topics+time, time
-alert, contradictions/loose ends, decisions/actions, suggested questions, "since
-last analysis"). Speaker labels are now real names (`"You"` for the local user).
+Analysis prompt (PT-BR), sent on stdin with the transcript appended:
 
-Reference: `../google-meet-cc-to-srt` (shipping Meet-caption extension, v3.8.9) —
-lift its `SelectorManager` selector table into `bookmarklet.src.js`; ignore its
+```
+Você é um copiloto de reunião. Abaixo está a transcrição parcial de uma reunião
+em andamento, gerada a partir das legendas automáticas do Google Meet (pode conter
+erros de transcrição; ignore-os). Os rótulos de falante são os nomes reais dos
+participantes; 'You' é o usuário local.
+
+Responda em português, conciso, em tópicos:
+1. **Tópicos discutidos** — com tempo aproximado gasto em cada um (use os timestamps)
+2. **Alerta de tempo** — algum tópico está consumindo tempo demais?
+3. **Contradições / pontas soltas** — afirmações conflitantes ou questões levantadas e não resolvidas
+4. **Decisões e ações** — o que já foi decidido ou atribuído
+5. **Perguntas sugeridas** — 2-3 perguntas que 'You' poderia fazer agora para esclarecer pontas soltas, destravar decisões ou expor contradições
+6. **Desde a última análise** — o que mudou: tópicos novos, pontas soltas resolvidas, alertas que deixaram de valer
+```
+
+When a prior `analysis.txt` exists, it's prepended before the transcript so
+section 6 can be computed, with this framing (else omitted):
+
+```
+Sua análise anterior (use-a só para manter nomes de tópicos consistentes e calcular
+a seção 6 — re-derive todo o resto da transcrição):
+<prior analysis>
+
+Transcrição:
+<transcript>
+```
+
+Reference: [`google-meet-cc-to-srt`](https://github.com/yunho0130/google-meet-cc-to-srt)
+(shipping Meet-caption extension, v3.8.9) — lift its `SelectorManager` selector
+table into `bookmarklet.src.js`; ignore its
 capture algorithm (speaker-state/debounce/dedup — more than we need, see Hard
 Problems #2) and the rest (SRT export, OpenAI, sidepanel, offscreen).
 
@@ -271,8 +291,9 @@ Problems #2) and the rest (SRT export, OpenAI, sidepanel, offscreen).
 1. **Server skeleton** — session `Map`, `POST /caption` upsert (creates session by
    `meetingId`), `GET /` list, `GET /m/<id>` page, `GET /m/<id>/state`, writes
    transcript. Test with `curl` posting fake captions under two ids.
-2. **Analysis loop** — port prompt + CLI shell-out + empty-reply guard.
-3. **Page** — port `index.html`, poll `/state`.
+2. **Analysis loop** — CLI shell-out with the prompt (see Configuration) on stdin,
+   prior-analysis injection, empty-reply guard.
+3. **Page** — build the static shell (see Component 3), poll `/state`.
 4. **Bookmarklet** — `bookmarklet.src.js` (layered selectors + `WeakMap<Element,id>`
    per item, upsert POST on growth, ~400ms coalesce), minified to the `javascript:`
    blob. DOM behavior already validated against a two-participant call; wire it to
