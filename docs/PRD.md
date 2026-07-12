@@ -102,7 +102,10 @@ Types + CSP).
   `req.url.match(/^\/m\/([^/]+)(\/caption|\/state)?$/)` plus a couple of `if`s on `req.url`,
   not a route table or framework (stdlib `http` only).
 - Writes `meetings/<date>-<id>/transcript.txt` and `analysis.txt` (`meetings/`
-  git-ignored). Date in the dir since recurring Meet codes repeat across days;
+  git-ignored). `transcript.txt` is **rewritten whole** from the utterance map —
+  never appended, since an upserted item can grow *after* its line was written —
+  on each analysis tick (which renders the transcript anyway) and once on
+  shutdown. Date in the dir since recurring Meet codes repeat across days;
   in-memory session keys on `id` alone (one live at a time).
 - **Analysis loop:** one `setInterval(ANALYZE_EVERY)` per session; if that
   session's transcript changed since last run, spawn the CLI with the prompt **on
@@ -143,9 +146,10 @@ same ~400ms coalesce window (concurrent speakers) can arrive swapped. Invisible 
 the LLM analysis — crosstalk captions are interleaved approximations anyway.
 
 `ts` is the single home of the timestamp. The `[HH:MM Speaker] text` line
-(in insertion order) is **derived on read** — materialized for `/state` and appended
-to `transcript.txt`, never cached as a separate in-memory string. The utterance
-stays structured (not a flat pre-rendered line) because upsert replaces by `id`.
+(in insertion order) is **derived on read** — materialized for `/state` and written
+whole to `transcript.txt`, never cached as a separate in-memory string. The
+utterance stays structured (not a flat pre-rendered line) because upsert replaces
+by `id`.
 
 ## Local storage
 
