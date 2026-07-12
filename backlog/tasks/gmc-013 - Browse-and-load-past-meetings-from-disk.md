@@ -1,9 +1,11 @@
 ---
 id: GMC-013
 title: Browse and load past meetings from disk
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@mau'
 created_date: '2026-07-12 19:17'
+updated_date: '2026-07-12 22:04'
 labels:
   - frontend
   - backend

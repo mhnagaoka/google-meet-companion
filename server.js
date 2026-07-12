@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url"
 // Strict Meet-code parser: <id> is cross-origin input that becomes a
 // filesystem path, so anything else 404s before touching disk or the Map.
 const ROUTE = /^\/m\/([a-z]{3}-[a-z]{4}-[a-z]{3})(\/caption|\/state)?$/
+const MEETING_DIR = /^\d{4}-\d{2}-\d{2}-[a-z]{3}-[a-z]{4}-[a-z]{3}$/
 const MAX_BODY = 64 * 1024
 const CORS = {
   "Access-Control-Allow-Origin": "https://meet.google.com",
@@ -51,6 +52,101 @@ export function createApp({
 } = {}) {
   const sessions = new Map()
 
+  function parseDirName(name) {
+    if (!MEETING_DIR.test(name)) return null
+    return { date: name.slice(0, 10), id: name.slice(11) }
+  }
+
+  function mtimeIso(p) {
+    try {
+      return fs.statSync(p).mtime.toISOString()
+    } catch {
+      return null
+    }
+  }
+
+  function readTitle(sdir) {
+    try {
+      const first = fs
+        .readFileSync(path.join(sdir, "transcript.txt"), "utf8")
+        .split("\n")[0]
+      // '# Title — id' -> 'Title'; fall back to the raw line if it doesn't match.
+      const m = first.match(/^# (.+) — [a-z]{3}-[a-z]{4}-[a-z]{3}$/)
+      return m ? m[1] : first || null
+    } catch {
+      return null
+    }
+  }
+
+  function listDiskMeetings() {
+    let entries
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true })
+    } catch {
+      return []
+    }
+    const meetings = []
+    for (const e of entries) {
+      if (!e.isDirectory()) continue
+      const parsed = parseDirName(e.name)
+      if (!parsed) continue
+      meetings.push({
+        id: parsed.id,
+        title: readTitle(path.join(dir, e.name)) || parsed.id,
+        dir: path.join(dir, e.name),
+      })
+    }
+    return meetings
+  }
+
+  function findDiskDir(id) {
+    let entries
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true })
+    } catch {
+      return null
+    }
+    let best = null
+    let bestMtime = 0
+    for (const e of entries) {
+      if (!e.isDirectory()) continue
+      const parsed = parseDirName(e.name)
+      if (!parsed || parsed.id !== id) continue
+      const sdir = path.join(dir, e.name)
+      const mt = fs.statSync(sdir).mtimeMs
+      if (mt > bestMtime) {
+        bestMtime = mt
+        best = sdir
+      }
+    }
+    return best
+  }
+
+  function loadDiskMeeting(id) {
+    const sdir = findDiskDir(id)
+    if (!sdir) return null
+    const transcriptPath = path.join(sdir, "transcript.txt")
+    const analysisPath = path.join(sdir, "analysis.txt")
+    let transcript
+    try {
+      transcript = fs.readFileSync(transcriptPath, "utf8")
+    } catch {
+      return null
+    }
+    let analysis = ""
+    try {
+      analysis = fs.readFileSync(analysisPath, "utf8")
+    } catch {}
+    // ponytail: cross-midnight <date>-<id> dirs are not merged; we return the
+    // most recently touched dir. A meeting that spans midnight keeps two dirs.
+    return {
+      title: readTitle(sdir) || id,
+      transcript,
+      analysis,
+      updatedAt: mtimeIso(analysisPath) || mtimeIso(transcriptPath),
+    }
+  }
+
   function getSession(id, title) {
     let s = sessions.get(id)
     if (!s) {
@@ -64,14 +160,20 @@ export function createApp({
         prefix = fs.readFileSync(path.join(sdir, "transcript.txt"), "utf8")
         if (prefix && !prefix.endsWith("\n")) prefix += "\n"
       } catch {}
+      let analysis = ""
+      try {
+        analysis = fs.readFileSync(path.join(sdir, "analysis.txt"), "utf8")
+      } catch {}
       s = {
         id,
         title: title || id,
         dir: sdir,
         utterances: new Map(),
         prefix,
-        analysis: "",
-        updatedAt: null,
+        analysis,
+        updatedAt:
+          mtimeIso(path.join(sdir, "analysis.txt")) ||
+          mtimeIso(path.join(sdir, "transcript.txt")),
         dirty: false,
         inflight: false,
       }
@@ -172,7 +274,9 @@ export function createApp({
 
   async function handle(req, res) {
     if (req.url === "/" && req.method === "GET") {
-      const items = [...sessions.values()]
+      const byId = new Map(listDiskMeetings().map((m) => [m.id, m]))
+      for (const s of sessions.values()) byId.set(s.id, s)
+      const items = [...byId.values()]
         .map((s) => `<li><a href="/m/${s.id}">${escapeHtml(s.title)}</a></li>`)
         .join("")
       return res
@@ -188,15 +292,23 @@ export function createApp({
     if (req.method !== "GET") return res.writeHead(404).end()
     if (sub === "/state") {
       const s = sessions.get(id)
-      if (!s) return res.writeHead(404).end()
-      return res.writeHead(200, { "Content-Type": "application/json" }).end(
-        JSON.stringify({
-          title: s.title,
-          transcript: render(s),
-          analysis: s.analysis,
-          updatedAt: s.updatedAt,
-        }),
-      )
+      if (s) {
+        return res.writeHead(200, { "Content-Type": "application/json" }).end(
+          JSON.stringify({
+            title: s.title,
+            transcript: render(s),
+            analysis: s.analysis,
+            updatedAt: s.updatedAt,
+          }),
+        )
+      }
+      // View-only load: read from disk without materializing a live session,
+      // so the global analyze tick never fires for an ended meeting.
+      const disk = loadDiskMeeting(id)
+      if (!disk) return res.writeHead(404).end()
+      return res
+        .writeHead(200, { "Content-Type": "application/json" })
+        .end(JSON.stringify(disk))
     }
     return res
       .writeHead(200, { "Content-Type": "text/html; charset=utf-8" })

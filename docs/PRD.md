@@ -106,12 +106,15 @@ Types + CSP).
   headers aren't already sent) — an unhandled throw or rejection (e.g. a disk
   write failing) degrades persistence for that request instead of killing the
   server; memory state and `/state` keep serving.
-- `GET /` — lists active meetings (link to each `/m/<id>`).
+- `GET /` — lists meetings (link to each `/m/<id>`): in-memory sessions unioned
+  with on-disk `meetings/` dirs, so past meetings show after a restart.
 - `GET /m/<id>` — serves a **constant** HTML+JS shell, identical bytes for every
   `<id>`. No server-side rendering: `<id>` never appears in the HTML, only in the
   URL the shell's JS polls. The route ignores `<id>` and returns one fixed string
   (the page shell — see Component 3, read once at startup or inlined).
 - `GET /m/<id>/state` — JSON `{title, transcript, analysis, updatedAt}` for polling.
+  Falls back to a pure disk read (no session materialized, no analyze tick) when
+  the id has a `meetings/` dir but no live session.
 - **CORS:** `POST /m/<id>/caption` is cross-origin from `https://meet.google.com`, so
   respond with `Access-Control-Allow-Origin: https://meet.google.com` (not `*` —
   nothing else legitimately posts, and pinning it costs the same one line),
@@ -372,7 +375,9 @@ the kept-forever flat files as source of truth:
   search across all transcripts + analyses, so the archive becomes a personal
   knowledge base a human *or an agent* can query. Derived index, rebuildable from
   the `meetings/` files.
-- **History browsing** — a UI to browse past meetings, wired to that search.
+- **History browsing** — basic browse/view of past meetings from disk shipped in
+  GMC-013 (the `GET /` union + disk-backed `/state`); a richer UI wired to search
+  is the remaining future work here.
 - **Calendar-sourced metadata** — pull subject/agenda, invite description, attendee
   emails, organizer, and scheduled times from Google Calendar (needs Calendar API +
   a permission). This is the feature that introduces `meeting.json` as a per-meeting
