@@ -2,14 +2,14 @@ project_name: "google-meet-companion"
 default_status: "To Do"
 statuses: ["To Do", "In Progress", "Done"]
 labels: []
-definition_of_done: ["No linting errors", "All unit tests passing", "Code is reviewed by ponytail", "Changes are committed"]
+definition_of_done: ["No linting errors", "All unit tests passing", "Code is reviewed by ponytail", "Changes are committed on a branch named after the task id (e.g. gmc-999)", "Branch merged to main with git merge --no-ff"]
 date_format: yyyy-mm-dd
 max_column_width: 20
 default_editor: "zeditor --foreground"
 auto_open_browser: true
 default_port: 6420
 remote_operations: true
-auto_commit: false
+auto_commit: true
 filesystem_only: false
 zero_padded_ids: 3
 bypass_git_hooks: false

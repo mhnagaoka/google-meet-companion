@@ -1,5 +1,9 @@
 # CLAUDE.md
 
+## Branching
+
+Implement each Backlog task on its own branch named after the task id (e.g. `gmc-999`), branched from `main`. When the task is done, merge with `git merge --no-ff` into `main`.
+
 ## Commits
 
 Use conventional commits: `type: description` (e.g. `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
