@@ -4,7 +4,7 @@ title: Bookmarklet
 status: To Do
 assignee: []
 created_date: '2026-07-12 04:07'
-updated_date: '2026-07-12 05:14'
+updated_date: '2026-07-12 23:17'
 labels: []
 dependencies:
   - GMC-001
@@ -25,7 +25,10 @@ Self-contained inline bookmarklet capturing Meet captions and POSTing upserts to
 - [ ] #4 Meet code read from location.pathname (rides in the POST path); title from document.title (rides in the body with {id, speaker, text})
 - [ ] #5 Failed POSTs (server down) are dropped silently — no buffering
 - [ ] #6 End-to-end verified against a real Meet call: captions appear in the live page
+- [ ] #7 README.md documents setup on a fresh machine: clone, prerequisites (Node >=24, the LLM CLI), how to start the server, and how to install + use the bookmarklet (enable captions first, one-time Local Network Access prompt)
 <!-- AC:END -->
+
+
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
