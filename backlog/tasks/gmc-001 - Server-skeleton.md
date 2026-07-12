@@ -1,11 +1,11 @@
 ---
 id: GMC-001
 title: Server skeleton
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-07-12 04:06'
-updated_date: '2026-07-12 04:53'
+updated_date: '2026-07-12 04:55'
 labels: []
 dependencies:
   - GMC-006
@@ -46,11 +46,19 @@ Node server (server.js, stdlib http only) with in-memory session Map and transcr
 
 <!-- SECTION:NOTES:BEGIN -->
 server.js + server.test.js (7 node:test tests, all passing), test script added. Verified with curl under two ids incl. upsert-in-place and per-id transcript files.
+
+Ponytail review: applied 2 shrinks (single-literal SHELL, mkdtemp folded into test start() helper). Biome clean, 7/7 tests passing after fixes.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added server.js (stdlib http, no deps): createApp({dir}) factory binding 127.0.0.1, strict Meet-code regex router, caption upsert into per-session ordered Map with server-stamped HH:MM, 64KB body cap + JSON try/catch, CORS pinned to https://meet.google.com, GET / list / constant shell / state JSON, transcript.txt rewritten whole with frozen-prefix restart recovery. Verified with 7 node:test HTTP tests (npm test) and live curl under two meeting ids.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No linting errors
-- [ ] #2 All unit tests passing
-- [ ] #3 Code is reviewed by ponytail
+- [x] #1 No linting errors
+- [x] #2 All unit tests passing
+- [x] #3 Code is reviewed by ponytail
 <!-- DOD:END -->
