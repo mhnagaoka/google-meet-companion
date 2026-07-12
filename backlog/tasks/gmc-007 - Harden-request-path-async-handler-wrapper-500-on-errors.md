@@ -4,6 +4,7 @@ title: 'Harden request path: async handler wrapper, 500 on errors'
 status: To Do
 assignee: []
 created_date: '2026-07-12 05:23'
+updated_date: '2026-07-12 05:29'
 labels: []
 dependencies:
   - GMC-001
@@ -22,7 +23,11 @@ Sync throws and promise rejections inside request handlers (e.g. fs.writeFileSyn
 - [ ] #2 Any sync throw or promise rejection in the request path logs the error and responds 500 when headers are not yet sent (connection just ends otherwise); the process never exits
 - [ ] #3 A caption POST whose transcript write fails (e.g. session dir removed mid-meeting) returns 500 but the upsert survives in memory and GET /m/<id>/state still serves it
 - [ ] #4 Existing tests keep passing; a new test forces a write failure and asserts the 500 plus a subsequent successful request
+- [ ] #5 A comment at the createServer wrapper states the invariant: it is the only error boundary, new routes go inside handle(), a second listener needs its own wrapper
+- [ ] #6 PRD component 2 documents the single wrapped async handler as the request-path error boundary (500 + log on unhandled errors)
 <!-- AC:END -->
+
+
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
