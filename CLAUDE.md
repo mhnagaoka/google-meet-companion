@@ -1,5 +1,9 @@
 # CLAUDE.md
 
+## Questions open a discussion, not work
+
+When the user asks a question ("what do you think?", "should we...?", "is this worth...?"), the deliverable is your assessment — answer and discuss, and do not start doing whatever the question suggests. Act only after an explicit request.
+
 ## Code changes require a Backlog task
 
 Every code change, however small, must be tied to a Backlog task — if none exists, create one before touching code. This overrides the Backlog overview's "skip task creation for obvious mechanical edits" guidance for code; docs-only edits are exempt.
