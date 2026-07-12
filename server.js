@@ -57,49 +57,46 @@ export function createApp({ dir = "meetings" } = {}) {
     return out
   }
 
-  function handleCaption(req, res, id) {
+  async function handleCaption(req, res, id) {
     if (req.method === "OPTIONS") return res.writeHead(204, CORS).end()
     if (req.method !== "POST") return res.writeHead(404).end()
     let body = ""
-    req.on("data", (chunk) => {
+    for await (const chunk of req) {
       body += chunk
-      if (body.length > MAX_BODY) {
-        res.writeHead(413, CORS).end()
-        req.destroy()
-      }
-    })
-    req.on("end", () => {
-      if (res.writableEnded) return
-      let data
-      try {
-        data = JSON.parse(body)
-        if (typeof data.id !== "string" || typeof data.text !== "string")
-          throw new Error("bad shape")
-      } catch {
-        return res.writeHead(400, CORS).end()
-      }
-      const s = getSession(id, data.title)
-      const u = s.utterances.get(data.id)
-      if (u) {
-        u.speaker = data.speaker
-        u.text = data.text
-      } else {
-        const ts = new Date().toTimeString().slice(0, 5) // server arrival time
-        s.utterances.set(data.id, {
-          ts,
-          speaker: data.speaker,
-          text: data.text,
-        })
-      }
-      s.updatedAt = new Date().toISOString()
-      // ponytail: rewrite-whole on every POST; move to the analysis tick
-      // (GMC-002) if per-caption sync writes ever show up as jank.
-      fs.writeFileSync(path.join(s.dir, "transcript.txt"), render(s))
-      res.writeHead(204, CORS).end()
-    })
+      // returning mid-iteration destroys req, same as the old req.destroy()
+      if (body.length > MAX_BODY) return res.writeHead(413, CORS).end()
+    }
+    let data
+    try {
+      data = JSON.parse(body)
+      if (typeof data.id !== "string" || typeof data.text !== "string")
+        throw new Error("bad shape")
+    } catch {
+      return res.writeHead(400, CORS).end()
+    }
+    const s = getSession(id, data.title)
+    const u = s.utterances.get(data.id)
+    if (u) {
+      u.speaker = data.speaker
+      u.text = data.text
+    } else {
+      const ts = new Date().toTimeString().slice(0, 5) // server arrival time
+      s.utterances.set(data.id, {
+        ts,
+        speaker: data.speaker,
+        text: data.text,
+      })
+    }
+    s.updatedAt = new Date().toISOString()
+    // ponytail: rewrite-whole on every POST; move to the analysis tick
+    // (GMC-002) if per-caption sync writes ever show up as jank.
+    // A failed write 500s but the upsert above already stuck: memory (and
+    // /state) stay ahead of disk by design.
+    fs.writeFileSync(path.join(s.dir, "transcript.txt"), render(s))
+    res.writeHead(204, CORS).end()
   }
 
-  return http.createServer((req, res) => {
+  async function handle(req, res) {
     if (req.url === "/" && req.method === "GET") {
       const items = [...sessions.values()]
         .map((s) => `<li><a href="/m/${s.id}">${escapeHtml(s.title)}</a></li>`)
@@ -130,7 +127,19 @@ export function createApp({ dir = "meetings" } = {}) {
     return res
       .writeHead(200, { "Content-Type": "text/html; charset=utf-8" })
       .end(SHELL)
-  })
+  }
+
+  // Sole error boundary for the request path: every route must run inside
+  // handle() so sync throws and rejections become a logged 500 instead of an
+  // uncaughtException killing the server mid-meeting. A second
+  // http.createServer (the PRD's future share server) needs its own wrapper.
+  return http.createServer((req, res) =>
+    handle(req, res).catch((err) => {
+      console.error(err)
+      if (!res.headersSent) res.writeHead(500)
+      res.end()
+    }),
+  )
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
