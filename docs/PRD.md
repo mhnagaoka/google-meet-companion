@@ -264,10 +264,12 @@ timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
    Within the region, one **item per speaker turn** (`.nMcdL.bj4p3b`), each holding
    speaker (`.NWpY1d`) + text (`.ygicle.VbkSUe`). Obfuscated classes are precise but
    rename-prone — and the remedy is already the maintenance story (selectors up
-   top, one-line edit + re-minify), so **no class-free fallback parser**. Keep an
-   **exclude list** (`[role="dialog"]`, `button`, mute/camera controls) so the
-   observer ignores non-caption UI. All of it in `bookmarklet.src.js`; one-file
-   maintenance.
+   top, one-line edit + re-minify), so **no class-free fallback parser**. No
+   exclude list either (GMC-004): the observer is scoped to the captions region
+   and only reads the exact item class `.nMcdL.bj4p3b`, so non-caption UI
+   (`[role="dialog"]`, buttons, mute/camera controls) can't match — an exclude
+   list would guard a parser we don't build. All of it in `bookmarklet.src.js`;
+   one-file maintenance.
 
 2. **Update-vs-append + rolling window (the actual hard part).** Meet's behavior:
    - Each **caption item is one speaker turn** — a stable element that grows text in

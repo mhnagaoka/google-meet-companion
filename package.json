@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "node server.js",
+    "build:bookmarklet": "node build-bookmarklet.js",
     "test": "node --test",
     "check": "biome check --write ."
   },

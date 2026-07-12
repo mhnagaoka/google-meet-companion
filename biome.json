@@ -24,6 +24,16 @@
       "semicolons": "asNeeded"
     }
   },
+  "overrides": [
+    {
+      "includes": ["bookmarklet.src.js"],
+      "javascript": {
+        "formatter": {
+          "semicolons": "always"
+        }
+      }
+    }
+  ],
   "assist": {
     "enabled": true,
     "actions": {
