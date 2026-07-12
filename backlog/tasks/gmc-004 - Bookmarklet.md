@@ -4,7 +4,7 @@ title: Bookmarklet
 status: To Do
 assignee: []
 created_date: '2026-07-12 04:07'
-updated_date: '2026-07-12 04:20'
+updated_date: '2026-07-12 05:14'
 labels: []
 dependencies:
   - GMC-001
@@ -32,4 +32,5 @@ Self-contained inline bookmarklet capturing Meet captions and POSTing upserts to
 - [ ] #1 No linting errors
 - [ ] #2 All unit tests passing
 - [ ] #3 Code is reviewed by ponytail
+- [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
 <!-- DOD:END -->
