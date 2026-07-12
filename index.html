@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>google-meet-companion</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      font-family: system-ui, sans-serif;
+    }
+    header {
+      padding: 0.5rem 1rem;
+      background: #f3f4f6;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    header h1 { margin: 0; font-size: 1rem; }
+    header span { color: #6b7280; font-size: 0.875rem; }
+    main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .transcript {
+      flex: 1;
+      padding: 1rem;
+      overflow: auto;
+      background: #111827;
+      color: #f3f4f6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      white-space: pre-wrap;
+    }
+    .analysis {
+      flex: 1;
+      padding: 1rem;
+      overflow: auto;
+      background: #f9fafb;
+      color: #111827;
+    }
+    .analysis :first-child { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="title">Loading…</h1>
+    <span id="updated">Waiting for analysis…</span>
+  </header>
+  <main>
+    <section id="transcript" class="transcript"></section>
+    <section id="analysis" class="analysis"></section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const id = location.pathname.match(/\/m\/([a-z0-9-]+)/)?.[1];
+    const stateUrl = `/m/${id}/state`;
+    const titleEl = document.getElementById("title");
+    const updatedEl = document.getElementById("updated");
+    const transcriptEl = document.getElementById("transcript");
+    const analysisEl = document.getElementById("analysis");
+
+    let lastUpdatedAt;
+
+    function isScrolledToBottom(el) {
+      return el.scrollHeight - el.scrollTop - el.clientHeight <= 1;
+    }
+
+    function formatTime(iso) {
+      if (!iso) return "Waiting for analysis…";
+      return `Last analysis: ${new Date(iso).toLocaleTimeString()}`;
+    }
+
+    async function poll() {
+      let data;
+      try {
+        const res = await fetch(stateUrl);
+        if (!res.ok) return;
+        data = await res.json();
+      } catch {
+        return;
+      }
+
+      const autoScroll = isScrolledToBottom(transcriptEl);
+      transcriptEl.textContent = data.transcript;
+      if (autoScroll) transcriptEl.scrollTop = transcriptEl.scrollHeight;
+
+      if (data.updatedAt !== lastUpdatedAt) {
+        lastUpdatedAt = data.updatedAt;
+        titleEl.textContent = data.title || id;
+        updatedEl.textContent = formatTime(data.updatedAt);
+        analysisEl.innerHTML = data.analysis ? marked.parse(data.analysis, { async: false }) : "";
+      }
+    }
+
+    poll();
+    setInterval(poll, 2000);
+  </script>
+</body>
+</html>
