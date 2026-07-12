@@ -10,6 +10,8 @@ Implement each Backlog task on its own branch named after the task id (e.g. `gmc
 
 Mark the task Done only after the merge: code commits and in-progress task updates go on the branch, then merge into `main`, then set the task to Done (plus finalization notes) and commit that on `main`. Done means the work is reachable from `main`.
 
+The `backlog` CLI auto-commits its task-file changes to the current branch (`autoCommit: true` in the backlog config) — never stage `backlog/` files manually, and be on the right branch when editing a task, since the commit lands immediately.
+
 ## Commits
 
 Use conventional commits: `type: description` (e.g. `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
