@@ -1,10 +1,11 @@
 ---
 id: GMC-009
 title: Transcript replay dev tool
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-07-12 14:17'
+updated_date: '2026-07-12 14:18'
 labels: []
 dependencies: []
 ordinal: 9000
@@ -23,6 +24,20 @@ Dev tooling to feed a real meeting transcription through the analysis loop witho
 - [ ] #3 Replay aborts with the failing line number on a non-2xx response
 - [ ] #4 dev/README.md documents replay.js and the frozen-prefix one-shot path, including the timestamp caveat (server stamps arrival time on replay)
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. dev/replay.js: read transcript file, parse '[HH:MM Speaker] text' / 'Speaker: text' lines, POST each as a caption with paced delay; abort with line number on non-2xx
+2. dev/README.md: table row for replay.js + document the frozen-prefix one-shot path and the replay timestamp caveat
+3. Smoke test against a local server with ANALYZE_EVERY high (no LLM spawn), biome check
+<!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Backfilled task: implementation done conversationally before the 'code changes require a Backlog task' directive (CLAUDE.md) was adopted; this task records it per the new rule. Smoke test passed (both line formats parsed, transcript rendered via /state), biome clean.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
