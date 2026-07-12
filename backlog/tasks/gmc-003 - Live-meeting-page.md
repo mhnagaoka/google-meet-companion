@@ -1,10 +1,11 @@
 ---
 id: GMC-003
 title: Live meeting page
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@mau'
 created_date: '2026-07-12 04:07'
-updated_date: '2026-07-12 05:14'
+updated_date: '2026-07-12 16:06'
 labels: []
 dependencies:
   - GMC-001
@@ -26,6 +27,15 @@ Static HTML+JS shell (index.html) showing live transcript and analysis. See docs
 - [ ] #5 Transcript autoscrolls only when already at the bottom
 - [ ] #6 GET /m/<id> serves this shell instead of the GMC-001 placeholder
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Replace the SHELL constant in server.js (lines 43-45, currently the GMC-001 placeholder) with the real index.html: static shell, two full-height columns (transcript left dark/mono/pre-wrap, analysis right light/markdown via CDN marked), header with title + last-analysis time. JS derives <id> from location.pathname, polls /m/<id>/state ~2s, re-render gated on updatedAt, transcript autoscroll only when already at bottom. The /m/<id> route already serves SHELL (server.js:204), so no routing change needed (AC #6 already wired).
+2. Generate via Kimi K2.7 Code (opencode run --auto) with prepended ponytail ruleset; Kimi does not commit and does not touch backlog/.
+3. Review diff (ponytail lens) + biome + node --test myself.
+4. Commit feat:, merge --no-ff into main, mark Done on main.
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
