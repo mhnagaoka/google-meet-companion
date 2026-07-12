@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-07-12 04:07'
-updated_date: '2026-07-12 13:11'
+updated_date: '2026-07-12 13:12'
 labels: []
 dependencies:
   - GMC-001
@@ -29,6 +29,19 @@ Periodic LLM analysis of live transcripts via CLI shell-out. See docs/PRD.md 'Co
 - [ ] #7 An empty or killed reply never clobbers the last good analysis.txt
 - [ ] #8 transcript.txt is rewritten on each analysis tick and once on shutdown
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. server.js: PT-BR PROMPT constant (from PRD Configuration) + CLIS map {claude: -p --model sonnet --effort low, opencode: run}, both fed on stdin
+2. Session gains dirty/inflight flags; caption handler sets dirty and stops writing transcript.txt
+3. One global setInterval((ANALYZE_EVERY||120)s) in createApp, unref'd, cleared on server close; per session: dirty && !inflight -> analyze()
+4. analyze(): clear dirty, set inflight, rewrite transcript.txt, spawn CLI async with {timeout: 5min}, prompt on stdin (prior analysis injected per PRD framing); on close: clear inflight, ignore empty/nonzero-exit output, else write analysis.txt + update state. Tick body try/caught so disk failures can't kill the process (tick runs outside the request error boundary)
+5. Shutdown flush: rewrite all transcripts on server 'close'; main block traps SIGINT/SIGTERM -> closeAllConnections + server.close -> exit
+6. Tests: fake CLI via node -e; cover dirty gating/no-rerun-when-clean, stdin prompt + prior-analysis injection, empty and timeout-killed replies keep last good analysis.txt, inflight blocks concurrent spawns, flush-on-close; adapt GMC-001 tests that assumed per-POST writes (disk assert after close; write-failure test becomes tick-survives-disk-failure)
+7. PRD: update Component 2 + Local storage (transcript writer moves from caption POST to analysis tick + shutdown flush)
+8. biome check, node --test, ponytail review
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
