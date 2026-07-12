@@ -97,7 +97,10 @@ Types + CSP).
   duplicated partial line (the item mid-growth at the crash), which the LLM won't
   blink at.
 - `POST /m/<id>/caption` — upsert `{title, id, speaker, text}` into that
-  session's ordered Map. `meetingId` comes from the path, not the body.
+  session's ordered Map. `meetingId` comes from the path, not the body. The body
+  is cross-origin input: cap it (~64 KB; real caption POSTs are <1 KB) and wrap
+  `JSON.parse` in a try/catch → `400` — an uncaught throw in the handler kills
+  the whole process mid-meeting.
 - `GET /` — lists active meetings (link to each `/m/<id>`).
 - `GET /m/<id>` — serves a **constant** HTML+JS shell, identical bytes for every
   `<id>`. No server-side rendering: `<id>` never appears in the HTML, only in the
