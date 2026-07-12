@@ -176,6 +176,35 @@ test("shell is identical bytes for every id", async () => {
   await stop(server)
 })
 
+test("transcript write failure answers 500, keeps memory, server survives", async () => {
+  const { server, base, dir } = await start()
+
+  await postCaption(base, ID1, {
+    title: "Standup",
+    id: "u1",
+    speaker: "Alice",
+    text: "on disk",
+  })
+  // make the next transcript write throw: session dir becomes a plain file
+  const date = new Date().toISOString().slice(0, 10)
+  const sdir = path.join(dir, `${date}-${ID1}`)
+  fs.rmSync(sdir, { recursive: true })
+  fs.writeFileSync(sdir, "")
+
+  const res = await postCaption(base, ID1, {
+    id: "u2",
+    speaker: "Bob",
+    text: "memory only",
+  })
+  assert.equal(res.status, 500)
+
+  // upsert survived in memory; the subsequent request proves the process did too
+  const state = await (await fetch(`${base}/m/${ID1}/state`)).json()
+  assert.match(state.transcript, /memory only/)
+
+  await stop(server)
+})
+
 test("restart recovery: existing transcript becomes a frozen prefix", async () => {
   let { server, base, dir } = await start()
   await postCaption(base, ID1, {

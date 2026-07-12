@@ -101,6 +101,11 @@ Types + CSP).
   is cross-origin input: cap it (~64 KB; real caption POSTs are <1 KB) and wrap
   `JSON.parse` in a try/catch → `400` — an uncaught throw in the handler kills
   the whole process mid-meeting.
+- **Request-path error boundary:** all routes run inside a single wrapped async
+  handler whose top-level `.catch` logs the error and answers `500` (when
+  headers aren't already sent) — an unhandled throw or rejection (e.g. a disk
+  write failing) degrades persistence for that request instead of killing the
+  server; memory state and `/state` keep serving.
 - `GET /` — lists active meetings (link to each `/m/<id>`).
 - `GET /m/<id>` — serves a **constant** HTML+JS shell, identical bytes for every
   `<id>`. No server-side rendering: `<id>` never appears in the HTML, only in the
