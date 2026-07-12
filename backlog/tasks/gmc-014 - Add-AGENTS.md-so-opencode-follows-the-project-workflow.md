@@ -1,7 +1,7 @@
 ---
 id: GMC-014
 title: Add AGENTS.md so opencode follows the project workflow
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-07-12 21:52'
 updated_date: '2026-07-12 21:53'
@@ -23,7 +23,11 @@ opencode reads AGENTS.md (not CLAUDE.md), so a delegated opencode/Kimi agent cur
 - [x] #2 opencode run picks up the workflow (backlog CLI, branch-per-task, conventional commits, ponytail) without per-prompt instructions
 <!-- AC:END -->
 
+## Implementation Notes
 
+<!-- SECTION:NOTES:BEGIN -->
+Symlinked AGENTS.md -> CLAUDE.md. Verified opencode/Kimi loads the workflow unprompted (named the backlog CLI + branch-per-task rule with no instructions). Single source of truth stays CLAUDE.md.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
