@@ -192,7 +192,10 @@ to matter.
 **On-disk**, under `meetings/<date>-<id>/` (**git-ignored**, kept forever — never
 pruned):
 
-- `transcript.txt` — rendered `[HH:MM Speaker] text` lines in insertion order.
+- `transcript.txt` — first line is a title header (`# <title> — <meetingId>`),
+  then the rendered `[HH:MM Speaker] text` lines in insertion order. The header is
+  what makes the title survive server exit (the dirname only holds date + code);
+  the restart-recovery prefix inherits it for free.
 - `analysis.txt` — latest good LLM analysis (markdown).
 
 No `meeting.json` in v1. Every field it would hold is already available without
