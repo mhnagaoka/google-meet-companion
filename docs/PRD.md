@@ -84,7 +84,13 @@ Types + CSP).
 ### 2. Node server (`server.js`, stdlib only)
 
 - Keeps `Map<meetingId, session>`; a session is created on first `POST /m/<id>/caption`
-  for a code.
+  for a code. **Restart recovery:** if the day's `transcript.txt` already exists at
+  creation (server restarted mid-meeting; the bookmarklet keeps POSTing), read it
+  into a frozen `prefix` string; every render is `prefix +` lines-from-the-map. Without
+  it, rewrite-whole would clobber the pre-restart transcript with the near-empty new
+  map. No session JSON, no parsing lines back into utterances — worst case is one
+  duplicated partial line (the item mid-growth at the crash), which the LLM won't
+  blink at.
 - `POST /m/<id>/caption` — upsert `{title, id, speaker, text}` into that
   session's ordered Map. `meetingId` comes from the path, not the body.
 - `GET /` — lists active meetings (link to each `/m/<id>`).
@@ -175,7 +181,8 @@ Two layers.
 
 **In-memory** (`Map<meetingId, session>`, lost on exit), per session: `meetingId`,
 `title`, the ordered utterance map (see Data model), the last analysis text +
-`updatedAt`, and the analysis loop's bookkeeping (`dirty` + in-flight flags). *Known limitation:* **sessions are never evicted** — the server
+`updatedAt`, the analysis loop's bookkeeping (`dirty` + in-flight flags), and the
+restart-recovery `prefix` (usually empty — see Component 2). *Known limitation:* **sessions are never evicted** — the server
 can't tell a meeting ended, so ended sessions sit in the Map until restart. Cost
 is one change-check per tick and the transcript in RAM (KBs per meeting, no LLM
 calls once the transcript stops changing); a restart between meetings clears it.
