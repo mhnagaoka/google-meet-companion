@@ -8,7 +8,7 @@ and what changed since the last analysis.
 ```
 Bookmarklet (clicked once per call on meet.google.com)
   MutationObserver on the captions DOM
-    → POST /caption {meetingId, title, id, speaker, text, seq}   (upsert)
+    → POST /caption {meetingId, title, id, speaker, text}   (upsert)
       → local Node server (localhost:8737), one long-lived process
           • Map<meetingId, session>: ordered utterance map (+ transcript.txt)
           • per-session analysis loop → analysis.txt  (LLM every N sec if changed)
@@ -85,7 +85,7 @@ Types + CSP).
 
 - Keeps `Map<meetingId, session>`; a session is created on first `POST /m/<id>/caption`
   for a code.
-- `POST /m/<id>/caption` — upsert `{title, id, speaker, text, seq}` into that
+- `POST /m/<id>/caption` — upsert `{title, id, speaker, text}` into that
   session's ordered Map. `meetingId` comes from the path, not the body.
 - `GET /` — lists active meetings (link to each `/m/<id>`).
 - `GET /m/<id>` — serves a **constant** HTML+JS shell, identical bytes for every
@@ -119,7 +119,7 @@ Types + CSP).
   JS reads `<id>` from `location.pathname` and builds its own `/m/<id>/state` URL.
 - Polls `/state` every ~2s. `ponytail:` re-render is gated on `updatedAt` — skip it
   when unchanged (idle call → no work; analysis is byte-identical between the ~120s
-  runs). Ceiling: full transcript re-render on a long call; upgrade path is a `seq`
+  runs). Ceiling: full transcript re-render on a long call; upgrade path is a
   high-water cursor + append, only if the tail ever janks.
 
 ## Data model
@@ -128,7 +128,6 @@ An utterance (within a session keyed by `meetingId`):
 
 ```
 { id: string,        // per caption item (speaker turn), from WeakMap<Element,id>
-  seq: number,        // monotonic first-seen order, for sorting
   speaker: string,    // Meet participant name ("You" for the local user)
   text: string,       // item's current text; grows live, upsert replaces by id
   ts: "HH:MM" }       // server arrival time (Meet exposes no caption time)
@@ -137,8 +136,14 @@ An utterance (within a session keyed by `meetingId`):
 Every `POST /caption` also carries `meetingId` (Meet code) and `title` (for
 display); the server routes it to the matching session, creating one on first sight.
 
+**Ordering is Map insertion order** — the session Map preserves first-sight order
+of each `id`, so there is no `seq` field and no sort. *Known limitation:* this is
+first-POST **arrival** order, not DOM creation order; two items born within the
+same ~400ms coalesce window (concurrent speakers) can arrive swapped. Invisible to
+the LLM analysis — crosstalk captions are interleaved approximations anyway.
+
 `ts` is the single home of the timestamp. The `[HH:MM Speaker] text` line
-(ordered by `seq`) is **derived on read** — materialized for `/state` and appended
+(in insertion order) is **derived on read** — materialized for `/state` and appended
 to `transcript.txt`, never cached as a separate in-memory string. The utterance
 stays structured (not a flat pre-rendered line) because upsert replaces by `id`.
 
@@ -153,7 +158,7 @@ Two layers.
 **On-disk**, under `meetings/<date>-<id>/` (**git-ignored**, kept forever — never
 pruned):
 
-- `transcript.txt` — rendered `[HH:MM Speaker] text` lines in `seq` order.
+- `transcript.txt` — rendered `[HH:MM Speaker] text` lines in insertion order.
 - `analysis.txt` — latest good LLM analysis (markdown).
 
 No `meeting.json` in v1. Every field it would hold is already available without
