@@ -1,9 +1,11 @@
 ---
 id: GMC-015
 title: Add a vertical divider between the transcript and analysis panes
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@opencode'
 created_date: '2026-07-12 22:33'
+updated_date: '2026-07-12 22:34'
 labels: []
 dependencies: []
 ordinal: 15000
