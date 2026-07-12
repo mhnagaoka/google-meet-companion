@@ -172,7 +172,13 @@ Two layers.
 
 **In-memory** (`Map<meetingId, session>`, lost on exit), per session: `meetingId`,
 `title`, the ordered utterance map (see Data model), the last analysis text +
-`updatedAt`, and the analysis loop's bookkeeping (last transcript size seen).
+`updatedAt`, and the analysis loop's bookkeeping (last transcript size seen +
+in-flight flag). *Known limitation:* **sessions are never evicted** — the server
+can't tell a meeting ended, so ended sessions sit in the Map until restart. Cost
+is one change-check per tick and the transcript in RAM (KBs per meeting, no LLM
+calls once the transcript stops changing); a restart between meetings clears it.
+Add idle-eviction only if a long-running server ever accumulates enough sessions
+to matter.
 
 **On-disk**, under `meetings/<date>-<id>/` (**git-ignored**, kept forever — never
 pruned):
