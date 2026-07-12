@@ -1,7 +1,7 @@
 ---
 id: GMC-007
 title: 'Harden request path: async handler wrapper, 500 on errors'
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-07-12 05:23'
@@ -44,12 +44,18 @@ Sync throws and promise rejections inside request handlers (e.g. fs.writeFileSyn
 Implemented per the settled design: routes moved into async handle(req, res); createServer callback is handle().catch that logs, writes 500 iff !res.headersSent, and ends. Body read via for await deletes the data/end callbacks and the writableEnded guard (server.js net -3 lines in the handler). New test turns the session dir into a plain file so the transcript write throws ENOTDIR: POST answers 500, the upsert survives in memory, and GET /state (a subsequent request) proves the process survived. PRD Component 2 gained the error-boundary bullet. Ponytail review: nothing to cut — no abstractions added, both new comments carry constraints the code can't show. Validation: npm test 8/8 pass, npm run check clean.
 <!-- SECTION:NOTES:END -->
 
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Request path hardened: all routes funnel through one async handle(req, res) whose top-level .catch logs and answers 500 (when headers aren't sent), so disk failures degrade persistence instead of killing the server. Body reading switched to for await, deleting the data/end callbacks; 413/400 semantics unchanged. Invariant comment at the createServer wrapper; PRD Component 2 documents the error boundary. Verified: new write-failure test (500 + upsert survives in memory + subsequent request served) plus all 7 existing tests pass, Biome clean. Merged to main with --no-ff.
+<!-- SECTION:FINAL_SUMMARY:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
 - [x] #1 No linting errors
 - [x] #2 All unit tests passing
 - [x] #3 Code is reviewed by ponytail
 - [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
-- [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
-- [ ] #6 Branch merged to main with git merge --no-ff
+- [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
+- [x] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
