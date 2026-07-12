@@ -1,11 +1,11 @@
 ---
 id: GMC-013
 title: Browse and load past meetings from disk
-status: In Progress
+status: Done
 assignee:
   - '@mau'
 created_date: '2026-07-12 19:17'
-updated_date: '2026-07-12 22:04'
+updated_date: '2026-07-12 22:05'
 labels:
   - frontend
   - backend
@@ -31,11 +31,11 @@ Keep it minimal (ponytail): the meetings/ directory listing IS the feature. No s
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 GET / lists on-disk meetings (union with any in-memory sessions), each linking to its /m/<id> page; title recovered from the transcript's first line or falls back to the id
-- [ ] #2 GET /m/<id>/state returns the saved transcript + analysis from disk when the id has a meeting dir but no live session
-- [ ] #3 A view-only (disk-backed) load creates no in-memory session and triggers no analyze tick / LLM call
-- [ ] #4 getSession restores analysis from analysis.txt (and updatedAt from mtime) so a rejoined live meeting shows prior analysis immediately, not a blank pane
-- [ ] #5 GET /m/<id> still serves byte-identical SHELL for every id (unchanged); the 'shell is identical bytes for every id' test still passes
+- [x] #1 GET / lists on-disk meetings (union with any in-memory sessions), each linking to its /m/<id> page; title recovered from the transcript's first line or falls back to the id
+- [x] #2 GET /m/<id>/state returns the saved transcript + analysis from disk when the id has a meeting dir but no live session
+- [x] #3 A view-only (disk-backed) load creates no in-memory session and triggers no analyze tick / LLM call
+- [x] #4 getSession restores analysis from analysis.txt (and updatedAt from mtime) so a rejoined live meeting shows prior analysis immediately, not a blank pane
+- [x] #5 GET /m/<id> still serves byte-identical SHELL for every id (unchanged); the 'shell is identical bytes for every id' test still passes
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -48,6 +48,12 @@ Keep it minimal (ponytail): the meetings/ directory listing IS the feature. No s
 5. Tests: disk-backed /state returns saved data and creates no session/tick; GET / lists a disk-only meeting; analysis recovery on getSession; shell-identical test still green.
 6. Note the deferred edges as ponytail comments (cross-midnight <date>-<id> mismatch on next-day rejoin; no analyze tick on view-only).
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Full-lifecycle delegation experiment (2nd run of GMC-013 after resetting main to a clean slate; AGENTS.md->CLAUDE.md now feeds opencode the workflow). Kimi self-drove branch+backlog+commit unprompted. CODE: accepted one-shot, 0 correction rounds, no clean-but-wrong; slightly better than the 1st run (Map-overlay dedup with live-wins; findDiskDir returns newest dir for the cross-midnight edge; helpers reused, no duplication). Verified independently: biome clean, 14/14 tests. WORKFLOW DEFECT: Kimi ran the In-Progress task edit while still on main, so the autocommit leaked onto main before it branched (violates 'branch before editing a task'; backlog autoCommit). Remediation by me: reset stray off main, rebuilt the branch with correct ordering, cherry-picked Kimi's code commit verbatim, re-applied the PRD updates Kimi omitted (DoD #4). Original Kimi branch kept as gmc-013-kimi for evidence.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
