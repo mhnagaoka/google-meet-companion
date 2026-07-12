@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-07-12 04:06'
-updated_date: '2026-07-12 04:50'
+updated_date: '2026-07-12 04:51'
 labels: []
 dependencies:
   - GMC-006
@@ -30,6 +30,17 @@ Node server (server.js, stdlib http only) with in-memory session Map and transcr
 - [ ] #8 Restart recovery: existing transcript.txt at session creation is read into a frozen prefix; renders are prefix + lines-from-map
 - [ ] #9 Verified with curl posting fake captions under two different ids
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. server.js: createApp({dir}) factory (stdlib http) returning the server; direct-run entry listens on 127.0.0.1:PORT
+2. One strict id regex routes everything; 404 otherwise
+3. Session Map created on first caption POST; restart recovery reads existing transcript.txt into frozen prefix; transcript rewritten whole on each POST (analysis tick doesn't exist until GMC-002)
+4. 64KB body cap (413), try/catch JSON.parse (400), CORS pinned to https://meet.google.com with OPTIONS 204
+5. GET / meeting list, GET /m/<id> constant shell placeholder, GET /m/<id>/state JSON
+6. meetings/ gitignored; server.test.js (node:test + fetch) covers all ACs incl. restart recovery; add 'test': 'node --test' script
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
