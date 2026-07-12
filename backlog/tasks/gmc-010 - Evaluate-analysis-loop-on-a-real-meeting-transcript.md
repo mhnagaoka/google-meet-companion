@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-07-12 14:32'
-updated_date: '2026-07-12 14:56'
+updated_date: '2026-07-12 15:25'
 labels: []
 dependencies: []
 references:
@@ -42,6 +42,23 @@ Feed the real 2026-07-10 'Daily Dark App' meeting transcript (Google Meet export
 
 <!-- SECTION:NOTES:BEGIN -->
 Finding: Meet ASR corrupts person names inside speech while speaker labels stay correct ('Mal' for Mau/Mauricio, 'Damari' for 'da Mari'/Mariana), and the analysis inherits them. Follow-ups: GMC-011 (prompt-side name reconciliation) and DRAFT-001 (participant roster scraping, contingent on GMC-011 falling short + GMC-004).
+
+=== Evaluation rounds (protocol: 692 filtered 'Speaker: text' lines from the real 2026-07-10 daily, replayed at 500ms via dev/replay.js, ANALYZE_EVERY=120; four distinct analysis ticks each, verified by checksum watcher; mid-run-dirty re-analysis behaved as designed in both rounds) ===
+
+Round 1 — claude CLI, sonnet, low effort (meet code drk-appd-ily):
+- All six PROMPT sections well-formed. Strongest: contradições/pontas soltas (unconfirmed bucket deploy, sandbox sem previsão, base64/fontes sem dono) and section 6 delta tracking ('Persiste' tags, one 'alerta anterior encerrado') — prior-analysis injection clearly works.
+- Noticed the meeting ended (goodbyes) and reframed section 5 questions as async follow-ups.
+- Handled fragmented captions and stray cyrillic noise; speaker names preserved verbatim.
+- Name reconciliation half-failed: kept 'Alan/Damari' in section 1 while correctly saying 'Alan + Mariana' in section 4 (see GMC-011).
+- Timing caveat: replay compresses the meeting to ~6 min, so per-topic durations are replay-clock, not real (inherent to replay; frozen-prefix path would preserve real timestamps).
+
+Round 2 — opencode CLI, opencode-go/deepseek-v4-flash (meet code opc-appd-ily; llm injected via disposable node -e launcher through createApp's llm option — no repo change):
+- opencode stdout was clean (no ANSI codes or session headers under non-TTY spawn); the sibling meeting-companion project's sed scrubbing is NOT needed here. CLIS.opencode plumbing validated, but note it carries no -m flag, so the model must be pinned externally.
+- More granular and concrete than round 1: per-topic time table, caught details Sonnet skipped ('variável com aspas', ticket 888, 'Mi off / banco de horas' — all verified in transcript).
+- Resolved 'Damari' -> Mariana unprompted (GMC-011's target behavior with the current prompt).
+- Weaknesses: fabricated 'S3' (team uses GCS); said 'banco de dados' where the real topic was the new production environment (Sonnet got this right); missed that the meeting had ended.
+
+User adjudication (attended the meeting): prefers DeepSeek's version overall despite the two fabrications. Takeaways: the prompt carries the quality — pipeline is not Claude-dependent; deepseek-v4-flash (free on the user's opencode Go plan) is a viable default. Candidate follow-up (not yet tasked): a prompt line against fabricated specificity (only use terms present in the transcript).
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
