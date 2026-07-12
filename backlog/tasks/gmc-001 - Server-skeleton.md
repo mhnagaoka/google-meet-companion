@@ -1,10 +1,11 @@
 ---
 id: GMC-001
 title: Server skeleton
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-07-12 04:06'
-updated_date: '2026-07-12 04:20'
+updated_date: '2026-07-12 04:50'
 labels: []
 dependencies:
   - GMC-006
