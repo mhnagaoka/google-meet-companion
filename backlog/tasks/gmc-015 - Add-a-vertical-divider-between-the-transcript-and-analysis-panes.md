@@ -19,8 +19,10 @@ Cosmetic polish: the two panes in index.html (dark transcript on the left, light
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The .analysis pane has a left border (1px solid #e5e7eb) that renders a visible vertical divider between the transcript and analysis panes; no other layout or behavior changes.
+- [x] #1 The .analysis pane has a left border (1px solid #e5e7eb) that renders a visible vertical divider between the transcript and analysis panes; no other layout or behavior changes.
 <!-- AC:END -->
+
+
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
