@@ -113,9 +113,19 @@ Types + CSP).
   in-memory session keys on `id` alone (one live at a time).
 - **Analysis loop:** one **global** `setInterval(ANALYZE_EVERY)` looping the
   session Map — a single timer, no per-session timer lifecycle to leak. For each
-  session whose transcript changed since last run, spawn the CLI with the prompt
-  **on stdin** (avoids ARG_MAX on long transcripts) and write its `analysis.txt`.
-  An empty reply must not clobber the last good analysis.
+  session whose transcript changed since last run **and has no run in flight**,
+  spawn the CLI **async** (`spawn`, never sync — a sync call would freeze caption
+  ingestion and `/state` for the whole LLM call) with the prompt **on stdin**
+  (avoids ARG_MAX on long transcripts) and write its `analysis.txt` on completion.
+  - **In-flight flag** per session: set on spawn, cleared on exit. A run may
+    legitimately outlive the interval (long transcript); the flag prevents a
+    second concurrent run racing to write the same `analysis.txt`. Skipped ticks
+    lose nothing — the transcript is still marked changed for the next free tick.
+  - **Hang timeout:** `spawn`'s own `{ timeout }` option (stdlib, no `timeout(1)`
+    wrapper), generous (~5 min) — a hang-guard so a wedged CLI can't hold the
+    in-flight flag forever, *not* an interval-fitter: killing a slow-but-working
+    run at <120s would livelock exactly on the long calls that need analysis most.
+  - An empty or killed reply must not clobber the last good analysis.
 
 ### 3. The page (`index.html`)
 
