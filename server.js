@@ -39,9 +39,8 @@ Responda em português, conciso, em tópicos:
 const PRIOR = `Sua análise anterior (use-a só para manter nomes de tópicos consistentes e calcular
 a seção 6 — re-derive todo o resto da transcrição):`
 
-// Constant shell, identical bytes for every id (real page is GMC-003).
-const SHELL =
-  "<!doctype html><meta charset=utf-8><title>google-meet-companion</title><p>Meeting page coming soon."
+// Constant shell, identical bytes for every id.
+const SHELL = fs.readFileSync(new URL("./index.html", import.meta.url), "utf8")
 
 const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`)
 
