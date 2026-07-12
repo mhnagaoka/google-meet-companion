@@ -1,10 +1,11 @@
 ---
 id: GMC-007
 title: 'Harden request path: async handler wrapper, 500 on errors'
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-07-12 05:23'
-updated_date: '2026-07-12 05:29'
+updated_date: '2026-07-12 05:34'
 labels: []
 dependencies:
   - GMC-001
@@ -27,7 +28,15 @@ Sync throws and promise rejections inside request handlers (e.g. fs.writeFileSyn
 - [ ] #6 PRD component 2 documents the single wrapped async handler as the request-path error boundary (500 + log on unhandled errors)
 <!-- AC:END -->
 
+## Implementation Plan
 
+<!-- SECTION:PLAN:BEGIN -->
+1. Restructure server.js: routes move into a single async handle(req, res); createServer callback becomes handle().catch(...) that logs, writes 500 if !res.headersSent, ends — with the invariant comment (AC #5).
+2. Rewrite handleCaption as async: read body via for await (const chunk of req), keeping the 64KB→413 and JSON→400 semantics; deletes data/end callbacks and the writableEnded guard.
+3. New test: caption POST, turn the session dir into a plain file, next POST asserts 500; GET /state still serves the upsert; subsequent request proves the process survived.
+4. PRD Component 2: one sentence documenting the wrapped async handler as the request-path error boundary (500 + log).
+5. npm test, npm run check, ponytail review of the diff, finalize per workflow.
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
