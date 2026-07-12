@@ -19,11 +19,13 @@ Dev tooling to feed a real meeting transcription through the analysis loop witho
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 node dev/replay.js <file> [meet-code] [delay-ms] POSTs each transcript line as a caption to a running local server, paced by the delay
-- [ ] #2 Lines in '[HH:MM Speaker] text' and 'Speaker: text' formats are parsed into speaker/text; other lines are sent whole with speaker Unknown
-- [ ] #3 Replay aborts with the failing line number on a non-2xx response
-- [ ] #4 dev/README.md documents replay.js and the frozen-prefix one-shot path, including the timestamp caveat (server stamps arrival time on replay)
+- [x] #1 node dev/replay.js <file> [meet-code] [delay-ms] POSTs each transcript line as a caption to a running local server, paced by the delay
+- [x] #2 Lines in '[HH:MM Speaker] text' and 'Speaker: text' formats are parsed into speaker/text; other lines are sent whole with speaker Unknown
+- [x] #3 Replay aborts with the failing line number on a non-2xx response
+- [x] #4 dev/README.md documents replay.js and the frozen-prefix one-shot path, including the timestamp caveat (server stamps arrival time on replay)
 <!-- AC:END -->
+
+
 
 ## Implementation Plan
 

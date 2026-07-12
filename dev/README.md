@@ -17,6 +17,7 @@ re-verified when Meet changes its DOM.
 | `caption-test-script.md` | PT-BR choreography (Mau + Laura) — what to say and when, each phase targeting one probe metric. | Made the two-participant test reproducible: solo speech, rapid alternation, simultaneous speech, mid-turn pause, long monologue. |
 | `caption-test-script.html` | Same script as a self-contained styled page for the second participant to read live. | Laura needed something readable during the call; hides the technical/DevTools bits. |
 | `dom-behavior.md` | The findings: step-by-step DOM behavior in each scenario, with the recorded timeline. | The payoff — why `captions.js`/the bookmarklet is built the way it is. Companion reference to the PRD. |
+| `replay.js` | POSTs a transcript file line-by-line into a running server as live captions. | Feeds real meeting data through the analysis loop without a live call. For a one-shot analysis with the transcript's *original* timestamps, skip replay: pre-seed `meetings/<date>-<id>/transcript.txt` before the first caption POST and the server picks it up as a frozen prefix. |
 
 ## How they connect
 
