@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-07-12 04:07'
-updated_date: '2026-07-12 23:18'
+updated_date: '2026-07-12 23:22'
 labels: []
 dependencies:
   - GMC-001
@@ -20,13 +20,13 @@ Self-contained inline bookmarklet capturing Meet captions and POSTing upserts to
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Readable source in bookmarklet.src.js with all DOM selectors declared up top; build step minifies to the javascript: blob (~1 KB)
-- [ ] #2 MutationObserver watches the captions region using the layered selectors; each caption item is tagged via WeakMap<Element,id>
-- [ ] #3 Items are POSTed as upserts to /m/<code>/caption as their text grows, coalesced ~400ms
-- [ ] #4 Meet code read from location.pathname (rides in the POST path); title from document.title (rides in the body with {id, speaker, text})
-- [ ] #5 Failed POSTs (server down) are dropped silently — no buffering
+- [x] #1 Readable source in bookmarklet.src.js with all DOM selectors declared up top; build step minifies to the javascript: blob (~1 KB)
+- [x] #2 MutationObserver watches the captions region using the layered selectors; each caption item is tagged via WeakMap<Element,id>
+- [x] #3 Items are POSTed as upserts to /m/<code>/caption as their text grows, coalesced ~400ms
+- [x] #4 Meet code read from location.pathname (rides in the POST path); title from document.title (rides in the body with {id, speaker, text})
+- [x] #5 Failed POSTs (server down) are dropped silently — no buffering
 - [ ] #6 End-to-end verified against a real Meet call: captions appear in the live page
-- [ ] #7 README.md documents setup on a fresh machine: clone, prerequisites (Node >=24, the LLM CLI), how to start the server, and how to install + use the bookmarklet (enable captions first, one-time Local Network Access prompt)
+- [x] #7 README.md documents setup on a fresh machine: clone, prerequisites (Node >=24, the LLM CLI), how to start the server, and how to install + use the bookmarklet (enable captions first, one-time Local Network Access prompt)
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -38,10 +38,16 @@ Self-contained inline bookmarklet capturing Meet captions and POSTing upserts to
 4. Test: assert the built blob starts with javascript: and parses as valid JS (new Function). Skip DOM unit tests (browser code; verified E2E in AC#6).
 <!-- SECTION:PLAN:END -->
 
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Implemented bookmarklet.src.js (readable IIFE), build-bookmarklet.js minifier + npm 'build:bookmarklet' script, build-bookmarklet.test.js (2 tests), README.md, .gitignore (blob is a build artifact), and a biome per-file override (semicolons 'always' on the src so whitespace-collapse minify stays ASI-safe). Blob ~1.4KB, parses OK. 16/16 tests pass, biome clean. Deviation recorded in PRD Hard Problems #1: dropped the exclude list (observer is region-scoped + reads only .nMcdL.bj4p3b, so non-caption UI can't match). AC#6 (real Meet E2E) intentionally left unchecked — verified during tomorrow's live call after push+clone.
+<!-- SECTION:NOTES:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No linting errors
-- [ ] #2 All unit tests passing
-- [ ] #3 Code is reviewed by ponytail
-- [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
+- [x] #1 No linting errors
+- [x] #2 All unit tests passing
+- [x] #3 Code is reviewed by ponytail
+- [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
 <!-- DOD:END -->
