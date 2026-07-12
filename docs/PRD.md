@@ -237,7 +237,8 @@ timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
    sticks; new turn → new item → new id. Concurrent speakers fall out for free
    (independent items). **No debounce, no dedup, no server-side fuzzy-merge** — the
    element *is* the identity. Per-item POSTs are coalesced with a light ~400ms
-   trailing debounce purely to cut transport chatter, not for identity; live
+   trailing debounce purely to cut transport chatter, not for identity (a constant
+   in `bookmarklet.src.js` — baked into the blob, not runtime config); live
    word-by-word growth is preserved.
 
    *Known limitations (documented, not built for):* an unhit condition that swaps an
@@ -259,7 +260,6 @@ timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
 |---|---|---|
 | `PORT` | `8737` | server port / page URL |
 | `ANALYZE_EVERY` | `120` | seconds between analyses per session (practical floor ~60) |
-| `POST_COALESCE` | `~400` | ms trailing debounce coalescing per-item POSTs (bookmarklet-side, transport only) |
 | arg 1 | `claude` | `claude` (sonnet, low effort) or `opencode` |
 
 Meeting id and title come from the bookmarklet per-POST — no server-side title arg.
