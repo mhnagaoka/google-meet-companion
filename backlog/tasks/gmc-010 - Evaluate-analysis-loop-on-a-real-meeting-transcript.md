@@ -1,11 +1,11 @@
 ---
 id: GMC-010
 title: Evaluate analysis loop on a real meeting transcript
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-07-12 14:32'
-updated_date: '2026-07-12 15:25'
+updated_date: '2026-07-12 15:29'
 labels: []
 dependencies: []
 references:
@@ -21,10 +21,10 @@ Feed the real 2026-07-10 'Daily Dark App' meeting transcript (Google Meet export
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The transcript is replayed into a running server and at least two analysis ticks complete, so prior-analysis injection and section 6 (desde a última análise) are exercised
-- [ ] #2 Header/participant lines from the export are not fed as captions (preprocess; only 'Speaker: text' lines go through)
-- [ ] #3 Analysis output is evaluated against the six PROMPT sections and findings are recorded in the task's implementation notes
-- [ ] #4 Neither the transcript nor generated meeting artifacts are committed to git
+- [x] #1 The transcript is replayed into a running server and at least two analysis ticks complete, so prior-analysis injection and section 6 (desde a última análise) are exercised
+- [x] #2 Header/participant lines from the export are not fed as captions (preprocess; only 'Speaker: text' lines go through)
+- [x] #3 Analysis output is evaluated against the six PROMPT sections and findings are recorded in the task's implementation notes
+- [x] #4 Neither the transcript nor generated meeting artifacts are committed to git
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -61,12 +61,18 @@ Round 2 — opencode CLI, opencode-go/deepseek-v4-flash (meet code opc-appd-ily;
 User adjudication (attended the meeting): prefers DeepSeek's version overall despite the two fabrications. Takeaways: the prompt carries the quality — pipeline is not Claude-dependent; deepseek-v4-flash (free on the user's opencode Go plan) is a viable default. Candidate follow-up (not yet tasked): a prompt line against fabricated specificity (only use terms present in the transcript).
 <!-- SECTION:NOTES:END -->
 
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Ran the real 2026-07-10 daily transcript (692 filtered caption lines, replayed at 500ms) through the analysis loop twice: claude/sonnet-low (drk-appd-ily) and opencode-go/deepseek-v4-flash via disposable createApp launcher (opc-appd-ily). Four analysis ticks each; prior-analysis injection, mid-run-dirty re-analysis, and section 6 delta tracking all worked. opencode stdout was clean (no ANSI/session noise). User adjudicated: DeepSeek's analysis preferred overall despite two fabrications ('S3' for a GCS bucket, 'banco de dados' for the new production environment). Detailed per-round findings in implementation notes. No code changed (DoD lint/tests pass untouched, branch/merge N/A — grep preprocess and shell launchers only); nothing meeting-related entered git. Follow-ups: GMC-011 (name reconciliation + anti-fabrication prompt), GMC-012 (pin opencode model), DRAFT-001 (participant roster).
+<!-- SECTION:FINAL_SUMMARY:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No linting errors
-- [ ] #2 All unit tests passing
-- [ ] #3 Code is reviewed by ponytail
-- [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
-- [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
-- [ ] #6 Branch merged to main with git merge --no-ff
+- [x] #1 No linting errors
+- [x] #2 All unit tests passing
+- [x] #3 Code is reviewed by ponytail
+- [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
+- [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
+- [x] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
