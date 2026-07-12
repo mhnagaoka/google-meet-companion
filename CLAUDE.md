@@ -1,5 +1,9 @@
 # CLAUDE.md
 
+## Code changes require a Backlog task
+
+Every code change, however small, must be tied to a Backlog task — if none exists, create one before touching code. This overrides the Backlog overview's "skip task creation for obvious mechanical edits" guidance for code; docs-only edits are exempt.
+
 ## Branching
 
 Implement each Backlog task on its own branch named after the task id (e.g. `gmc-999`), branched from `main`. When the task is done, merge with `git merge --no-ff` into `main`.
