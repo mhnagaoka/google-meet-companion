@@ -85,6 +85,9 @@ Types + CSP).
 
 ### 2. Node server (`server.js`, stdlib only)
 
+- **Listens on `127.0.0.1` explicitly** — `listen(PORT, '127.0.0.1')`, never the
+  `0.0.0.0` default: `GET /` lists every meeting and `/state` serves full
+  transcripts, so the default bind would expose them to anyone on the LAN.
 - Keeps `Map<meetingId, session>`; a session is created on first `POST /m/<id>/caption`
   for a code. **Restart recovery:** if the day's `transcript.txt` already exists at
   creation (server restarted mid-meeting; the bookmarklet keeps POSTing), read it
