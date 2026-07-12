@@ -1,9 +1,10 @@
 ---
 id: GMC-014
 title: Add AGENTS.md so opencode follows the project workflow
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-07-12 21:52'
+updated_date: '2026-07-12 21:52'
 labels:
   - tooling
 dependencies: []
