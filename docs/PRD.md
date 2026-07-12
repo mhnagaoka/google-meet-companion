@@ -94,10 +94,11 @@ Types + CSP).
   (the page shell — see Component 3, read once at startup or inlined).
 - `GET /m/<id>/state` — JSON `{title, transcript, analysis, updatedAt}` for polling.
 - **CORS:** `POST /m/<id>/caption` is cross-origin from `https://meet.google.com`, so
-  respond with `Access-Control-Allow-Origin: *`, `Access-Control-Allow-Headers:
-  Content-Type`, `Access-Control-Allow-Methods: POST, OPTIONS`, and answer the
-  `OPTIONS` preflight with `204`. No `Allow-Private-Network` header (see ADR-0001).
-  ~6 lines.
+  respond with `Access-Control-Allow-Origin: https://meet.google.com` (not `*` —
+  nothing else legitimately posts, and pinning it costs the same one line),
+  `Access-Control-Allow-Headers: Content-Type`, `Access-Control-Allow-Methods:
+  POST, OPTIONS`, and answer the `OPTIONS` preflight with `204`. No
+  `Allow-Private-Network` header (see ADR-0001). ~6 lines.
 - All routes share one `<id>` parser — a single
   `req.url.match(/^\/m\/([a-z]{3}-[a-z]{4}-[a-z]{3})(\/caption|\/state)?$/)` plus a
   couple of `if`s on `req.url`, not a route table or framework (stdlib `http` only).
