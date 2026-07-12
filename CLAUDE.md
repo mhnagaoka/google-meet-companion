@@ -4,6 +4,8 @@
 
 Implement each Backlog task on its own branch named after the task id (e.g. `gmc-999`), branched from `main`. When the task is done, merge with `git merge --no-ff` into `main`.
 
+Mark the task Done only after the merge: code commits and in-progress task updates go on the branch, then merge into `main`, then set the task to Done (plus finalization notes) and commit that on `main`. Done means the work is reachable from `main`.
+
 ## Commits
 
 Use conventional commits: `type: description` (e.g. `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
