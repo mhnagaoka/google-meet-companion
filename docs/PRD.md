@@ -99,8 +99,11 @@ Types + CSP).
   `OPTIONS` preflight with `204`. No `Allow-Private-Network` header (see ADR-0001).
   ~6 lines.
 - All routes share one `<id>` parser — a single
-  `req.url.match(/^\/m\/([^/]+)(\/caption|\/state)?$/)` plus a couple of `if`s on `req.url`,
-  not a route table or framework (stdlib `http` only).
+  `req.url.match(/^\/m\/([a-z]{3}-[a-z]{4}-[a-z]{3})(\/caption|\/state)?$/)` plus a
+  couple of `if`s on `req.url`, not a route table or framework (stdlib `http` only).
+  The strict Meet-code shape is load-bearing, not pedantry: `<id>` is cross-origin
+  input that becomes a filesystem path (`meetings/<date>-<id>/`), so anything else
+  (e.g. `../`) 404s before touching disk or the session Map.
 - Writes `meetings/<date>-<id>/transcript.txt` and `analysis.txt` (`meetings/`
   git-ignored). `transcript.txt` is **rewritten whole** from the utterance map —
   never appended, since an upserted item can grow *after* its line was written —
