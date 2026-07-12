@@ -4,8 +4,10 @@ title: Server skeleton
 status: To Do
 assignee: []
 created_date: '2026-07-12 04:06'
+updated_date: '2026-07-12 04:20'
 labels: []
-dependencies: []
+dependencies:
+  - GMC-006
 ordinal: 1000
 ---
 
@@ -30,8 +32,7 @@ Node server (server.js, stdlib http only) with in-memory session Map and transcr
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No type check errors
-- [ ] #2 No linting errors
-- [ ] #3 All unit tests passing
-- [ ] #4 Code is reviewed by ponytail
+- [ ] #1 No linting errors
+- [ ] #2 All unit tests passing
+- [ ] #3 Code is reviewed by ponytail
 <!-- DOD:END -->
