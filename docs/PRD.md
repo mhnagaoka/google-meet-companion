@@ -11,7 +11,7 @@ Bookmarklet (clicked once per call on meet.google.com)
     → POST /caption {meetingId, title, id, speaker, text}   (upsert)
       → local Node server (localhost:8737), one long-lived process
           • Map<meetingId, session>: ordered utterance map (+ transcript.txt)
-          • per-session analysis loop → analysis.txt  (LLM every N sec if changed)
+          • global analysis tick → per-session analysis.txt  (LLM every N sec if changed)
           • serves a side-by-side page per meeting, polled by the browser
 ```
 
@@ -111,10 +111,11 @@ Types + CSP).
   on each analysis tick (which renders the transcript anyway) and once on
   shutdown. Date in the dir since recurring Meet codes repeat across days;
   in-memory session keys on `id` alone (one live at a time).
-- **Analysis loop:** one `setInterval(ANALYZE_EVERY)` per session; if that
-  session's transcript changed since last run, spawn the CLI with the prompt **on
-  stdin** (avoids ARG_MAX on long transcripts) and write its `analysis.txt`. An
-  empty reply must not clobber the last good analysis.
+- **Analysis loop:** one **global** `setInterval(ANALYZE_EVERY)` looping the
+  session Map — a single timer, no per-session timer lifecycle to leak. For each
+  session whose transcript changed since last run, spawn the CLI with the prompt
+  **on stdin** (avoids ARG_MAX on long transcripts) and write its `analysis.txt`.
+  An empty reply must not clobber the last good analysis.
 
 ### 3. The page (`index.html`)
 
