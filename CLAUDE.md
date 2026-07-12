@@ -12,6 +12,8 @@ Every code change, however small, must be tied to a Backlog task — if none exi
 
 Implement each Backlog task on its own branch named after the task id (e.g. `gmc-999`), branched from `main`. When the task is done, merge with `git merge --no-ff` into `main`.
 
+Create the branch first — `git checkout -b gmc-999` off `main` **before** the first `backlog` edit for the task, including setting it In Progress. The very first task edit autocommits immediately (see below), so if you haven't branched yet it lands on `main` instead of the branch.
+
 Mark the task Done only after the merge: code commits and in-progress task updates go on the branch, then merge into `main`, then set the task to Done (plus finalization notes) and commit that on `main`. Done means the work is reachable from `main`.
 
 The `backlog` CLI auto-commits its task-file changes to the current branch (`autoCommit: true` in the backlog config) — never stage `backlog/` files manually, and be on the right branch when editing a task, since the commit lands immediately.
