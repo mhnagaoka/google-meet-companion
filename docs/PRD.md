@@ -122,8 +122,12 @@ Types + CSP).
 - Writes `meetings/<date>-<id>/transcript.txt` and `analysis.txt` (`meetings/`
   git-ignored). `transcript.txt` is **rewritten whole** from the utterance map —
   never appended, since an upserted item can grow *after* its line was written —
-  on each analysis tick (which renders the transcript anyway) and once on
-  shutdown. Date in the dir since recurring Meet codes repeat across days;
+  on **each caption POST** (the handler is the file's only writer). Disk is never
+  behind memory, so a crash loses nothing and there is no shutdown flush to build;
+  the write is a few hundred KB at most a few times a second (bookmarklet
+  coalescing), negligible. The analysis tick renders the transcript in memory for
+  the prompt and owns only `analysis.txt`. One writer per file, no overlap.
+  Date in the dir since recurring Meet codes repeat across days;
   in-memory session keys on `id` alone (one live at a time).
 - **Analysis loop:** one **global** `setInterval(ANALYZE_EVERY)` looping the
   session Map — a single timer, no per-session timer lifecycle to leak. For each
