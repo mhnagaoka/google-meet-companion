@@ -1,10 +1,11 @@
 ---
 id: GMC-010
 title: Evaluate analysis loop on a real meeting transcript
-status: To Do
+status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-07-12 14:32'
+updated_date: '2026-07-12 14:33'
 labels: []
 dependencies: []
 references:
@@ -25,6 +26,17 @@ Feed the real 2026-07-10 'Daily Dark App' meeting transcript (Google Meet export
 - [ ] #3 Analysis output is evaluated against the six PROMPT sections and findings are recorded in the task's implementation notes
 - [ ] #4 Neither the transcript nor generated meeting artifacts are committed to git
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Preprocess: grep only 'Speaker: text' lines into /tmp/gmc010-captions.txt (drops title/participants headers and blanks) — no replay.js change needed
+2. Start server (ANALYZE_EVERY=120, default claude sonnet low effort), background, log to /tmp
+3. Watch analysis.txt checksum every 20s to evidence distinct analysis ticks
+4. node dev/replay.js /tmp/gmc010-captions.txt drk-appd-ily 500 (~6 min replay => ~3 ticks)
+5. After replay + final tick: evaluate analysis vs the six PROMPT sections, record findings in notes, SIGINT server (shutdown flush)
+6. No code changes expected: DoD branch/merge items N/A; artifacts stay in gitignored meetings/ and /tmp
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
