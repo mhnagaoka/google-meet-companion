@@ -4,7 +4,7 @@ title: Add AGENTS.md so opencode follows the project workflow
 status: In Progress
 assignee: []
 created_date: '2026-07-12 21:52'
-updated_date: '2026-07-12 21:52'
+updated_date: '2026-07-12 21:53'
 labels:
   - tooling
 dependencies: []
@@ -19,9 +19,11 @@ opencode reads AGENTS.md (not CLAUDE.md), so a delegated opencode/Kimi agent cur
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 AGENTS.md exists at repo root as a symlink to CLAUDE.md
-- [ ] #2 opencode run picks up the workflow (backlog CLI, branch-per-task, conventional commits, ponytail) without per-prompt instructions
+- [x] #1 AGENTS.md exists at repo root as a symlink to CLAUDE.md
+- [x] #2 opencode run picks up the workflow (backlog CLI, branch-per-task, conventional commits, ponytail) without per-prompt instructions
 <!-- AC:END -->
+
+
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
