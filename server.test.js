@@ -364,3 +364,93 @@ test("in-flight blocks concurrent runs; timeout kills a hung CLI and frees it", 
 
   await stop(server)
 })
+
+test("GET / lists disk-only meetings with title from transcript", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gmc-"))
+  const date = new Date().toISOString().slice(0, 10)
+  const sdir = path.join(dir, `${date}-${ID1}`)
+  fs.mkdirSync(sdir, { recursive: true })
+  fs.writeFileSync(
+    path.join(sdir, "transcript.txt"),
+    `# Past Standup — ${ID1}\n[10:00 Alice] hello\n`,
+  )
+
+  const { server, base } = await start({ dir })
+  const index = await (await fetch(`${base}/`)).text()
+  assert.match(index, new RegExp(`/m/${ID1}`))
+  assert.match(index, /<a href="\/m\/abc-defg-hij">Past Standup<\/a>/)
+
+  await stop(server)
+})
+
+test("GET /m/<id>/state reads disk-only meeting without creating a session", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gmc-"))
+  const marker = path.join(dir, "analyzed")
+  const date = new Date().toISOString().slice(0, 10)
+  const sdir = path.join(dir, `${date}-${ID1}`)
+  fs.mkdirSync(sdir, { recursive: true })
+  fs.writeFileSync(
+    path.join(sdir, "transcript.txt"),
+    `# Old Meeting — ${ID1}\n[09:00 Bob] saved line\n`,
+  )
+  fs.writeFileSync(path.join(sdir, "analysis.txt"), "saved analysis")
+
+  const { server, base } = await start({
+    dir,
+    every: 25,
+    llm: fakeCli(
+      `require('fs').writeFileSync(${JSON.stringify(marker)},'');process.stdin.pipe(process.stdout)`,
+    ),
+  })
+
+  const res = await fetch(`${base}/m/${ID1}/state`)
+  assert.equal(res.status, 200)
+  const state = await res.json()
+  assert.equal(state.title, "Old Meeting")
+  assert.match(state.transcript, /saved line/)
+  assert.equal(state.analysis, "saved analysis")
+  assert.ok(state.updatedAt)
+
+  // No analyze tick should fire for a view-only load.
+  await new Promise((r) => setTimeout(r, 100))
+  assert.equal(
+    fs.existsSync(marker),
+    false,
+    "view-only load must not spawn an analysis",
+  )
+
+  // Repeated reads stay view-only and keep returning the saved analysis.
+  const state2 = await (await fetch(`${base}/m/${ID1}/state`)).json()
+  assert.equal(state2.analysis, "saved analysis")
+
+  await stop(server)
+})
+
+test("getSession recovers analysis.txt and updatedAt on rejoin", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gmc-"))
+  const date = new Date().toISOString().slice(0, 10)
+  const sdir = path.join(dir, `${date}-${ID1}`)
+  fs.mkdirSync(sdir, { recursive: true })
+  fs.writeFileSync(
+    path.join(sdir, "transcript.txt"),
+    `# Rejoin — ${ID1}\n[08:00 Alice] earlier\n`,
+  )
+  fs.writeFileSync(path.join(sdir, "analysis.txt"), "previous analysis")
+
+  const { server, base } = await start({ dir })
+  const before = await (await fetch(`${base}/m/${ID1}/state`)).json()
+  assert.equal(before.analysis, "previous analysis")
+  assert.ok(before.updatedAt)
+
+  // A caption POST rejoins and keeps the prior analysis in the live session.
+  await postCaption(base, ID1, {
+    id: "u1",
+    speaker: "Bob",
+    text: "after rejoin",
+  })
+  const after = await (await fetch(`${base}/m/${ID1}/state`)).json()
+  assert.equal(after.analysis, "previous analysis")
+  assert.match(after.transcript, /after rejoin/)
+
+  await stop(server)
+})
