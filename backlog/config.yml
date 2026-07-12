@@ -2,7 +2,7 @@ project_name: "google-meet-companion"
 default_status: "To Do"
 statuses: ["To Do", "In Progress", "Done"]
 labels: []
-definition_of_done: ["No linting errors", "All unit tests passing", "Code is reviewed by ponytail"]
+definition_of_done: ["No linting errors", "All unit tests passing", "Code is reviewed by ponytail", "Changes are committed"]
 date_format: yyyy-mm-dd
 max_column_width: 20
 default_editor: "zeditor --foreground"
