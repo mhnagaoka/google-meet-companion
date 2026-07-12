@@ -1,11 +1,11 @@
 ---
 id: GMC-002
 title: Analysis loop
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-07-12 04:07'
-updated_date: '2026-07-12 13:17'
+updated_date: '2026-07-12 13:18'
 labels: []
 dependencies:
   - GMC-001
@@ -54,6 +54,12 @@ Design decisions:
 - Tick body try/caught (it runs outside the request error boundary); disk failures log and degrade persistence only.
 Validation: biome clean; node --test 11/11 pass, covering dirty gating, no re-run when clean, stdin prompt + prior-analysis injection, empty reply non-clobber, in-flight blocking + spawn-timeout kill/release, tick disk-failure survival, shutdown flush (upsert + restart-recovery tests).
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Analysis loop implemented in server.js: one global setInterval((ANALYZE_EVERY||120)s) scans the session Map and, for dirty sessions with no run in flight, rewrites transcript.txt and spawns the LLM CLI async (claude -p --model sonnet --effort low, or opencode run) with the PT-BR prompt on stdin, prior analysis injected per PRD framing. spawn {timeout: 5min} guards hangs; empty/nonzero-exit replies never clobber analysis.txt. Caption handler now only marks sessions dirty; transcript.txt is written on each tick and flushed on shutdown (SIGINT/SIGTERM -> server.close). PRD updated for the writer move. Verified: biome clean, node --test 11/11.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
