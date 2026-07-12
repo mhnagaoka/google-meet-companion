@@ -8,7 +8,7 @@ and what changed since the last analysis.
 ```
 Bookmarklet (clicked once per call on meet.google.com)
   MutationObserver on the captions DOM
-    → POST /caption {meetingId, title, id, speaker, text}   (upsert)
+    → POST /m/<id>/caption {title, id, speaker, text}   (upsert)
       → local Node server (localhost:8737), one long-lived process
           • Map<meetingId, session>: ordered utterance map (+ transcript.txt)
           • global analysis tick → per-session analysis.txt  (LLM every N sec if changed)
@@ -70,9 +70,11 @@ Types + CSP).
   `WeakMap<Element,id>` and POSTed as an upsert as its text grows (see Hard
   Problems #2 for the model).
 - Reads the **Meet code** from `location.pathname` and the **title** from
-  `document.title`; both ride on every POST.
+  `document.title`; the code rides in the POST path, the title in the body.
 - **Per-item identity lives here, not in the server** (see Hard Problems #2).
-- Transport: `fetch('http://localhost:8737/caption', {method:'POST', body:JSON})`.
+- Transport: `fetch('http://localhost:8737/m/'+code+'/caption', {method:'POST',
+  body:JSON})` — the code in the path (so the server's strict parser guards every
+  route), `{title, id, speaker, text}` in the body.
   On first use per origin, Chrome prompts once for **Local Network Access**
   ("Allow"); granted, it persists — a documented one-time step, like enabling
   captions. A failed POST (server down) is dropped silently — no buffering.
@@ -120,7 +122,7 @@ Types + CSP).
 - **Analysis loop:** one **global** `setInterval(ANALYZE_EVERY)` looping the
   session Map — a single timer, no per-session timer lifecycle to leak. For each
   session that is **dirty and has no run in flight** — a per-session `dirty`
-  boolean set by the `POST /caption` upsert handler (the only write path) and
+  boolean set by the `POST /m/<id>/caption` upsert handler (the only write path) and
   cleared on spawn; no size/content comparison, the write path records the event —
   spawn the CLI **async** (`spawn`, never sync — a sync call would freeze caption
   ingestion and `/state` for the whole LLM call) with the prompt **on stdin**
@@ -160,8 +162,8 @@ An utterance (within a session keyed by `meetingId`):
   ts: "HH:MM" }       // server arrival time (Meet exposes no caption time)
 ```
 
-Every `POST /caption` also carries `meetingId` (Meet code) and `title` (for
-display); the server routes it to the matching session, creating one on first sight.
+The Meet code rides in the POST path (`/m/<id>/caption`), the `title` in the body
+(for display); the server routes to the matching session, creating one on first sight.
 
 **Ordering is Map insertion order** — the session Map preserves first-sight order
 of each `id`, so there is no `seq` field and no sort. *Known limitation:* this is
@@ -330,9 +332,10 @@ Problems #2) and the rest (SRT export, OpenAI, sidepanel, offscreen).
 
 ## Milestones
 
-1. **Server skeleton** — session `Map`, `POST /caption` upsert (creates session by
-   `meetingId`), `GET /` list, `GET /m/<id>` page, `GET /m/<id>/state`, writes
-   transcript. Test with `curl` posting fake captions under two ids.
+1. **Server skeleton** — session `Map`, `POST /m/<id>/caption` upsert (creates
+   session from the path `<id>`), `GET /` list, `GET /m/<id>` page,
+   `GET /m/<id>/state`, writes transcript. Test with `curl` posting fake captions
+   under two ids.
 2. **Analysis loop** — CLI shell-out with the prompt (see Configuration) on stdin,
    prior-analysis injection, empty-reply guard.
 3. **Page** — build the static shell (see Component 3), poll `/state`.
