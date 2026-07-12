@@ -10,6 +10,17 @@ Mark the task Done only after the merge: code commits and in-progress task updat
 
 Use conventional commits: `type: description` (e.g. `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
 
+In the commit body, add bullet points enumerating the most relevant changes, each with a brief rationale:
+
+```
+feat: add transcript flush on session end
+
+- Flush transcript buffer when the session closes, so partial captions aren't lost on abrupt exits.
+- Debounce flush to one per tick, to avoid redundant writes during rapid caption updates.
+```
+
+Trivial one-line changes may skip the body.
+
 <!-- BACKLOG.MD GUIDELINES START -->
 <CRITICAL_INSTRUCTION>
 
