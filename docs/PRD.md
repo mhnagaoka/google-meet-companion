@@ -208,9 +208,9 @@ timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
    `[role="region"][aria-label*="caption" i]`. Use a **layered selector list** in
    `bookmarklet.src.js`, first match wins:
    - `[role="region"][aria-label*="caption" i]` — primary (English UI).
-   - localized `aria-label` variants (pt "legenda", ko "자막", "subtitle", …) —
-     `aria-label` is localized to the user's Meet UI language.
-   - `[jsname="dsyhDe"]` — jsname fallback when a locale substring is missed.
+   - `[role="region"][aria-label*="legenda" i]` — the user's PT-BR UI (`aria-label`
+     is localized; other locales are YAGNI — the jsname layer below catches them).
+   - `[jsname="dsyhDe"]` — jsname fallback for any locale not listed.
    Within the region, one **item per speaker turn** (`.nMcdL.bj4p3b`), each holding
    speaker (`.NWpY1d`) + text (`.ygicle.VbkSUe`). Obfuscated classes are precise but
    rename-prone — and the remedy is already the maintenance story (selectors up
