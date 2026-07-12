@@ -212,9 +212,9 @@ timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
      `aria-label` is localized to the user's Meet UI language.
    - `[jsname="dsyhDe"]` — jsname fallback when a locale substring is missed.
    Within the region, one **item per speaker turn** (`.nMcdL.bj4p3b`), each holding
-   speaker (`.NWpY1d`) + text (`.ygicle.VbkSUe`). Obfuscated classes are the precise
-   primary; a class-free fallback (region child with an avatar `<img>`, then
-   `innerText.split('\n')` → `[speaker, ...text]`) survives a class rename. Keep an
+   speaker (`.NWpY1d`) + text (`.ygicle.VbkSUe`). Obfuscated classes are precise but
+   rename-prone — and the remedy is already the maintenance story (selectors up
+   top, one-line edit + re-minify), so **no class-free fallback parser**. Keep an
    **exclude list** (`[role="dialog"]`, `button`, mute/camera controls) so the
    observer ignores non-caption UI. All of it in `bookmarklet.src.js`; one-file
    maintenance.
