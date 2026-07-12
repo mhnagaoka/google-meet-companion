@@ -1,10 +1,11 @@
 ---
 id: GMC-004
 title: Bookmarklet
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-07-12 04:07'
-updated_date: '2026-07-12 23:17'
+updated_date: '2026-07-12 23:18'
 labels: []
 dependencies:
   - GMC-001
@@ -28,7 +29,14 @@ Self-contained inline bookmarklet capturing Meet captions and POSTing upserts to
 - [ ] #7 README.md documents setup on a fresh machine: clone, prerequisites (Node >=24, the LLM CLI), how to start the server, and how to install + use the bookmarklet (enable captions first, one-time Local Network Access prompt)
 <!-- AC:END -->
 
+## Implementation Plan
 
+<!-- SECTION:PLAN:BEGIN -->
+1. bookmarklet.src.js — readable IIFE. Layered region selectors + item/speaker/text selectors as top consts. WeakMap<Element,id> per item; MutationObserver on the region (childList+subtree+characterData) with a ~400ms trailing debounce; on flush, scan items, skip unchanged text (lastText Map), POST {title,id,speaker,text} to http://localhost:8737/m/<code>/caption, .catch()->drop. console.warn if no region. code from location.pathname, title from document.title.
+2. build-bookmarklet.js (node stdlib) — strip comments + collapse whitespace, prefix javascript:, write the blob. npm 'build:bookmarklet' script. Source authored minifier-safe (explicit semicolons, no // line comments in code).
+3. README.md — fresh-machine setup (clone, Node>=24 + LLM CLI, start server, install/use bookmarklet, captions-on + one-time LNA).
+4. Test: assert the built blob starts with javascript: and parses as valid JS (new Function). Skip DOM unit tests (browser code; verified E2E in AC#6).
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
