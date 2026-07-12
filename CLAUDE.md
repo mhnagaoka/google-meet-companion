@@ -30,3 +30,7 @@ Do not edit Backlog task, draft, document, decision, or milestone markdown files
 
 </CRITICAL_INSTRUCTION>
 <!-- BACKLOG.MD GUIDELINES END -->
+
+## Findings During Execution
+
+If work on a task surfaces something out of scope that deserves investigation, don't expand the current task. Create a Backlog draft (or a task, for clear bugs), reference it in the current task's implementation notes, and flag it to the user at wrap-up. If a finding invalidates the current task's plan or acceptance criteria, surface it immediately and update the task. Only interrupt mid-task for blockers.
