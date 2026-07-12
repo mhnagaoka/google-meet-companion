@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-07-12 04:06'
-updated_date: '2026-07-12 04:51'
+updated_date: '2026-07-12 04:53'
 labels: []
 dependencies:
   - GMC-006
@@ -20,15 +20,15 @@ Node server (server.js, stdlib http only) with in-memory session Map and transcr
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Server binds to 127.0.0.1 explicitly, never 0.0.0.0
-- [ ] #2 POST /m/<id>/caption upserts {title, id, speaker, text} into the session's ordered Map, creating the session from the path <id> on first POST
-- [ ] #3 All /m/... routes share one strict id parser (^/m/([a-z]{3}-[a-z]{4}-[a-z]{3})(/caption|/state)?$); anything else 404s before touching disk or the Map
-- [ ] #4 Body is capped (~64 KB) and JSON.parse is wrapped in try/catch returning 400 — malformed input never kills the process
-- [ ] #5 CORS: caption POST answers OPTIONS preflight with 204 and pins Access-Control-Allow-Origin to https://meet.google.com
-- [ ] #6 GET / lists active meetings with links; GET /m/<id> serves a constant placeholder shell (identical bytes for every id); GET /m/<id>/state returns {title, transcript, analysis, updatedAt}
-- [ ] #7 meetings/<date>-<id>/transcript.txt is rewritten whole from the utterance map (title header first line), and meetings/ is git-ignored
-- [ ] #8 Restart recovery: existing transcript.txt at session creation is read into a frozen prefix; renders are prefix + lines-from-map
-- [ ] #9 Verified with curl posting fake captions under two different ids
+- [x] #1 Server binds to 127.0.0.1 explicitly, never 0.0.0.0
+- [x] #2 POST /m/<id>/caption upserts {title, id, speaker, text} into the session's ordered Map, creating the session from the path <id> on first POST
+- [x] #3 All /m/... routes share one strict id parser (^/m/([a-z]{3}-[a-z]{4}-[a-z]{3})(/caption|/state)?$); anything else 404s before touching disk or the Map
+- [x] #4 Body is capped (~64 KB) and JSON.parse is wrapped in try/catch returning 400 — malformed input never kills the process
+- [x] #5 CORS: caption POST answers OPTIONS preflight with 204 and pins Access-Control-Allow-Origin to https://meet.google.com
+- [x] #6 GET / lists active meetings with links; GET /m/<id> serves a constant placeholder shell (identical bytes for every id); GET /m/<id>/state returns {title, transcript, analysis, updatedAt}
+- [x] #7 meetings/<date>-<id>/transcript.txt is rewritten whole from the utterance map (title header first line), and meetings/ is git-ignored
+- [x] #8 Restart recovery: existing transcript.txt at session creation is read into a frozen prefix; renders are prefix + lines-from-map
+- [x] #9 Verified with curl posting fake captions under two different ids
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -41,6 +41,12 @@ Node server (server.js, stdlib http only) with in-memory session Map and transcr
 5. GET / meeting list, GET /m/<id> constant shell placeholder, GET /m/<id>/state JSON
 6. meetings/ gitignored; server.test.js (node:test + fetch) covers all ACs incl. restart recovery; add 'test': 'node --test' script
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+server.js + server.test.js (7 node:test tests, all passing), test script added. Verified with curl under two ids incl. upsert-in-place and per-id transcript files.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
