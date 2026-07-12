@@ -113,14 +113,17 @@ Types + CSP).
   in-memory session keys on `id` alone (one live at a time).
 - **Analysis loop:** one **global** `setInterval(ANALYZE_EVERY)` looping the
   session Map — a single timer, no per-session timer lifecycle to leak. For each
-  session whose transcript changed since last run **and has no run in flight**,
+  session that is **dirty and has no run in flight** — a per-session `dirty`
+  boolean set by the `POST /caption` upsert handler (the only write path) and
+  cleared on spawn; no size/content comparison, the write path records the event —
   spawn the CLI **async** (`spawn`, never sync — a sync call would freeze caption
   ingestion and `/state` for the whole LLM call) with the prompt **on stdin**
   (avoids ARG_MAX on long transcripts) and write its `analysis.txt` on completion.
   - **In-flight flag** per session: set on spawn, cleared on exit. A run may
     legitimately outlive the interval (long transcript); the flag prevents a
     second concurrent run racing to write the same `analysis.txt`. Skipped ticks
-    lose nothing — the transcript is still marked changed for the next free tick.
+    lose nothing — captions arriving mid-run set `dirty` again, so the next free
+    tick re-analyzes.
   - **Hang timeout:** `spawn`'s own `{ timeout }` option (stdlib, no `timeout(1)`
     wrapper), generous (~5 min) — a hang-guard so a wedged CLI can't hold the
     in-flight flag forever, *not* an interval-fitter: killing a slow-but-working
@@ -172,8 +175,7 @@ Two layers.
 
 **In-memory** (`Map<meetingId, session>`, lost on exit), per session: `meetingId`,
 `title`, the ordered utterance map (see Data model), the last analysis text +
-`updatedAt`, and the analysis loop's bookkeeping (last transcript size seen +
-in-flight flag). *Known limitation:* **sessions are never evicted** — the server
+`updatedAt`, and the analysis loop's bookkeeping (`dirty` + in-flight flags). *Known limitation:* **sessions are never evicted** — the server
 can't tell a meeting ended, so ended sessions sit in the Map until restart. Cost
 is one change-check per tick and the transcript in RAM (KBs per meeting, no LLM
 calls once the transcript stops changing); a restart between meetings clears it.
