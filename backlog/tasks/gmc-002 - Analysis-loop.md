@@ -30,8 +30,6 @@ Periodic LLM analysis of live transcripts via CLI shell-out. See docs/PRD.md 'Co
 - [x] #8 transcript.txt is rewritten on each analysis tick and once on shutdown
 <!-- AC:END -->
 
-
-
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
@@ -45,10 +43,22 @@ Periodic LLM analysis of live transcripts via CLI shell-out. See docs/PRD.md 'Co
 8. biome check, node --test, ponytail review
 <!-- SECTION:PLAN:END -->
 
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Design decisions:
+- AC #8 supersedes the PRD's per-POST transcript write (the ponytail comment in the caption handler anticipated this move); PRD 'Writes meetings/...' paragraph updated accordingly. Caption handler now only upserts memory and sets dirty.
+- Shutdown flush rides the server 'close' event; main block traps SIGINT/SIGTERM -> closeAllConnections + close -> exit, so tests exercise the same flush path via server.close().
+- CLI descriptors: CLIS = { claude: `claude -p --model sonnet --effort low`, opencode: `opencode run` }, prompt on stdin; llm and every are injectable via createApp for tests (fake CLI = node -e).
+- Empty/killed guard is one branch: on 'close', code !== 0 || !out.trim() -> keep last good analysis.
+- Tick body try/caught (it runs outside the request error boundary); disk failures log and degrade persistence only.
+Validation: biome clean; node --test 11/11 pass, covering dirty gating, no re-run when clean, stdin prompt + prior-analysis injection, empty reply non-clobber, in-flight blocking + spawn-timeout kill/release, tick disk-failure survival, shutdown flush (upsert + restart-recovery tests).
+<!-- SECTION:NOTES:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No linting errors
-- [ ] #2 All unit tests passing
-- [ ] #3 Code is reviewed by ponytail
-- [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
+- [x] #1 No linting errors
+- [x] #2 All unit tests passing
+- [x] #3 Code is reviewed by ponytail
+- [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
 <!-- DOD:END -->
