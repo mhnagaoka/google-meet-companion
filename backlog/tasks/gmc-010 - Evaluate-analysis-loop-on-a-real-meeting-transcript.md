@@ -41,7 +41,7 @@ Feed the real 2026-07-10 'Daily Dark App' meeting transcript (Google Meet export
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
-Finding: Meet ASR corrupts person names inside speech while speaker labels stay correct ('Mal' for Mau/Mauricio, 'Damari' for 'da Mari'/Mariana), and the analysis inherits them. Follow-ups: GMC-011 (prompt-side name reconciliation) and draft GMC-012 (participant roster scraping, contingent on GMC-011 falling short + GMC-004).
+Finding: Meet ASR corrupts person names inside speech while speaker labels stay correct ('Mal' for Mau/Mauricio, 'Damari' for 'da Mari'/Mariana), and the analysis inherits them. Follow-ups: GMC-011 (prompt-side name reconciliation) and DRAFT-001 (participant roster scraping, contingent on GMC-011 falling short + GMC-004).
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
