@@ -1,11 +1,11 @@
 ---
 id: GMC-004
 title: Bookmarklet
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-07-12 04:07'
-updated_date: '2026-07-14 12:32'
+updated_date: '2026-07-14 12:33'
 labels: []
 dependencies:
   - GMC-001
