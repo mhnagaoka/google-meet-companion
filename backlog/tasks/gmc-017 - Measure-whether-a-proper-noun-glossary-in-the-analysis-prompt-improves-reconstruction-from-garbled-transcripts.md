@@ -6,6 +6,7 @@ title: >-
 status: In Progress
 assignee: []
 created_date: '2026-07-14 15:44'
+updated_date: '2026-07-14 15:54'
 labels: []
 dependencies: []
 ordinal: 17000
@@ -34,3 +35,25 @@ Spike/experiment. The analysis PROMPT (server.js) tells the model captions may c
 - [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+EXPERIMENTO CONCLUÍDO (branch gmc-017, provavelmente NÃO merged).
+
+Setup: 4 análises via frozen-prefix (dev/README.md), servidor com llm=opencode, timestamps reais preservados. Todas em meetings/ (gitignored).
+- ctl-orig-raw: texto CRU + prompt atual (sem glossário) — CONTROLE
+- trt-glos-raw: texto CRU + prompt com glossário de nomes próprios — TRATAMENTO
+- cor-rctd-abc / rpl-aaaa-bbb: runs auxiliares com transcrição corrigida (contexto anterior)
+
+Glossário testado (adicionado ao PROMPT em server.js): Projetos internos Dark/Malte/Visto; Ferramentas Backlog.md/OpenCode/Claude Code/Codex/MCP.
+
+RESULTADO (controle x tratamento, única variável = glossário):
+- GANHO: corrigiu alucinação 'OpenAI'->'OpenCode' e surfou 'MCP' explicitamente. Ambos batem com entradas do glossário.
+- SEM EFEITO: 'link da memória' (certo: 'limpa') e STT Vox/Whisper seguiram errados/omitidos nos dois — não são nomes do glossário.
+- Diferenca no alerta de tempo (controle mais afiado) = variancia de run, nao efeito do glossario.
+
+CONCLUSÃO: ganho real mas marginal e cirúrgico — glossário só FIXA os nomes próprios que lista, não melhora compreensão geral (o modelo já reconstrói o jargão sozinho a partir do texto cru). Custo: tokens por tick + superfície de config (onde guardar glossário por projeto).
+
+DECISÃO PENDENTE (do usuário): não vale merge automático. Só promover a mudança permanente (nova task) se inconsistência/alucinação de nomes próprios virar dor recorrente. Servidor está rodando o código da branch (com glossário) — precisa voltar pro prompt de main ao encerrar.
+<!-- SECTION:NOTES:END -->
