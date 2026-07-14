@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-07-12 04:07'
-updated_date: '2026-07-12 23:22'
+updated_date: '2026-07-14 12:32'
 labels: []
 dependencies:
   - GMC-001
@@ -25,7 +25,7 @@ Self-contained inline bookmarklet capturing Meet captions and POSTing upserts to
 - [x] #3 Items are POSTed as upserts to /m/<code>/caption as their text grows, coalesced ~400ms
 - [x] #4 Meet code read from location.pathname (rides in the POST path); title from document.title (rides in the body with {id, speaker, text})
 - [x] #5 Failed POSTs (server down) are dropped silently — no buffering
-- [ ] #6 End-to-end verified against a real Meet call: captions appear in the live page
+- [x] #6 End-to-end verified against a real Meet call: captions appear in the live page
 - [x] #7 README.md documents setup on a fresh machine: clone, prerequisites (Node >=24, the LLM CLI), how to start the server, and how to install + use the bookmarklet (enable captions first, one-time Local Network Access prompt)
 <!-- AC:END -->
 
@@ -42,6 +42,8 @@ Self-contained inline bookmarklet capturing Meet captions and POSTing upserts to
 
 <!-- SECTION:NOTES:BEGIN -->
 Implemented bookmarklet.src.js (readable IIFE), build-bookmarklet.js minifier + npm 'build:bookmarklet' script, build-bookmarklet.test.js (2 tests), README.md, .gitignore (blob is a build artifact), and a biome per-file override (semicolons 'always' on the src so whitespace-collapse minify stays ASI-safe). Blob ~1.4KB, parses OK. 16/16 tests pass, biome clean. Deviation recorded in PRD Hard Problems #1: dropped the exclude list (observer is region-scoped + reads only .nMcdL.bj4p3b, so non-caption UI can't match). AC#6 (real Meet E2E) intentionally left unchecked — verified during tomorrow's live call after push+clone.
+
+AC#6 verified: real Meet call end-to-end — captions captured by the bookmarklet appeared live in the meeting page.
 <!-- SECTION:NOTES:END -->
 
 ## Definition of Done
