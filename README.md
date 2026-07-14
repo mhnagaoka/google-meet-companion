@@ -78,6 +78,9 @@ npm test             # node --test
 npm run check        # biome check --write .
 ```
 
+Development tasks are tracked with [Backlog.md](https://backlog.md); the
+per-task branch/merge workflow lives in `CLAUDE.md` (aka `AGENTS.md`).
+
 Bookmarklet source lives in `bookmarklet.src.js` (readable, with all DOM
 selectors declared up top); edit it and re-run `npm run build:bookmarklet`. A
 Meet DOM change is a one-line selector edit + re-minify.
