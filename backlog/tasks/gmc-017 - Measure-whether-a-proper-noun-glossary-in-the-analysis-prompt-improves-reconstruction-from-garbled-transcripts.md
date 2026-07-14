@@ -3,10 +3,10 @@ id: GMC-017
 title: >-
   Measure whether a proper-noun glossary in the analysis prompt improves
   reconstruction from garbled transcripts
-status: In Progress
+status: Done
 assignee: []
 created_date: '2026-07-14 15:44'
-updated_date: '2026-07-14 15:54'
+updated_date: '2026-07-14 17:29'
 labels: []
 dependencies: []
 ordinal: 17000
@@ -20,10 +20,10 @@ Spike/experiment. The analysis PROMPT (server.js) tells the model captions may c
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 A control analysis exists: raw garbled transcript, current prompt, frozen-prefix (real timestamps), single run (no history)
-- [ ] #2 A treatment analysis exists: same raw transcript + frozen-prefix, but with a proper-noun glossary added to PROMPT
-- [ ] #3 The two analyses are diffed and the glossary's effect (name resolution, consistency, hallucinations) is documented in the task notes
-- [ ] #4 Decision recorded: is the glossary worth making permanent (new task) or not (branch stays unmerged)
+- [x] #1 A control analysis exists: raw garbled transcript, current prompt, frozen-prefix (real timestamps), single run (no history)
+- [x] #2 A treatment analysis exists: same raw transcript + frozen-prefix, but with a proper-noun glossary added to PROMPT
+- [x] #3 The two analyses are diffed and the glossary's effect (name resolution, consistency, hallucinations) is documented in the task notes
+- [x] #4 Decision recorded: is the glossary worth making permanent (new task) or not (branch stays unmerged)
 <!-- AC:END -->
 
 ## Definition of Done
@@ -57,3 +57,9 @@ CONCLUSÃO: ganho real mas marginal e cirúrgico — glossário só FIXA os nome
 
 DECISÃO PENDENTE (do usuário): não vale merge automático. Só promover a mudança permanente (nova task) se inconsistência/alucinação de nomes próprios virar dor recorrente. Servidor está rodando o código da branch (com glossário) — precisa voltar pro prompt de main ao encerrar.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Spike de medição. Rodadas frozen-prefix (dev/README.md) com llm=opencode e timestamps reais: controle (ctl-orig-raw, texto cru + prompt sem glossário) vs tratamento (trt-glos-raw, mesmo texto cru + glossário de nomes próprios no PROMPT do server.js). Verificado por diff das análises geradas em meetings/. Resultado: glossário deu ganho real mas marginal — corrigiu 'OpenAI'->'OpenCode' e surfou 'MCP' (ambos entradas do glossário), sem efeito fora dos nomes listados ('link'->'limpa' da memória e STT Vox/Whisper seguiram errados nos dois). Conclusão: glossário FIXA nomes próprios, não melhora compreensão (o modelo já reconstrói o jargão sozinho). Não vale merge; código do experimento preservado na branch gmc-017 (unmerged) para documentação. Task fechada na main só para fins documentais, por decisão do usuário (desvio consciente da regra 'Done só após merge').
+<!-- SECTION:FINAL_SUMMARY:END -->
