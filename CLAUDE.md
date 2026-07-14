@@ -6,7 +6,7 @@ When the user asks a question ("what do you think?", "should we...?", "is this w
 
 ## Code changes require a Backlog task
 
-Every code change, however small, must be tied to a Backlog task — if none exists, create one before touching code. This overrides the Backlog overview's "skip task creation for obvious mechanical edits" guidance for code; docs-only edits are exempt.
+Every code change, however small, must be tied to a Backlog task — if none exists, create one before touching code. This overrides the Backlog overview's "skip task creation for obvious mechanical edits" guidance for code; docs-only edits are exempt. Release/version tagging and the accompanying `package.json` version bump are also exempt — the git tag is its own record.
 
 ## Branching
 
