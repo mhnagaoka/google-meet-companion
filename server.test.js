@@ -1,5 +1,6 @@
 import assert from "node:assert/strict"
 import fs from "node:fs"
+import http from "node:http"
 import os from "node:os"
 import path from "node:path"
 import { test } from "node:test"
@@ -424,6 +425,142 @@ test("GET /m/<id>/state reads disk-only meeting without creating a session", asy
   assert.equal(state2.analysis, "saved analysis")
 
   await stop(server)
+})
+
+test("go-qwen fetch path calls zen endpoint and writes analysis.txt", async () => {
+  const key = `test-key-${Date.now()}`
+  const received = { headers: null, body: null }
+
+  const mock = http.createServer((req, res) => {
+    if (req.method !== "POST" || req.url !== "/v1/chat/completions") {
+      res.writeHead(404).end()
+      return
+    }
+    let body = ""
+    req.on("data", (c) => (body += c))
+    req.on("end", () => {
+      received.headers = req.headers
+      received.body = JSON.parse(body)
+      res.writeHead(200, { "Content-Type": "application/json" }).end(
+        JSON.stringify({
+          choices: [
+            {
+              message: {
+                role: "assistant",
+                content: "mocked zen analysis",
+              },
+            },
+          ],
+        }),
+      )
+    })
+  })
+
+  await new Promise((r) => mock.listen(0, "127.0.0.1", r))
+  const mockBase = `http://127.0.0.1:${mock.address().port}`
+
+  const oldKey = process.env.OPENCODE_API_KEY
+  process.env.OPENCODE_API_KEY = key
+  try {
+    const { server, base, dir } = await start({
+      every: 25,
+      llm: {
+        url: `${mockBase}/v1/chat/completions`,
+        model: "qwen3.7-plus",
+        thinking: { type: "disabled" },
+      },
+    })
+    const state = () => fetch(`${base}/m/${ID1}/state`).then((r) => r.json())
+
+    await postCaption(base, ID1, {
+      title: "Standup",
+      id: "u1",
+      speaker: "Alice",
+      text: "assunto",
+    })
+    await until(async () => (await state()).analysis)
+
+    assert.equal((await state()).analysis, "mocked zen analysis")
+    assert.equal(received.headers.authorization, `Bearer ${key}`)
+    assert.equal(received.body.model, "qwen3.7-plus")
+    assert.deepEqual(received.body.thinking, { type: "disabled" })
+    assert.equal(received.body.messages[0].role, "user")
+    assert.match(
+      received.body.messages[0].content,
+      /Você é um copiloto de reunião/,
+    )
+    assert.match(received.body.messages[0].content, /assunto/)
+
+    const date = new Date().toISOString().slice(0, 10)
+    assert.equal(
+      fs.readFileSync(path.join(dir, `${date}-${ID1}`, "analysis.txt"), "utf8"),
+      "mocked zen analysis",
+    )
+
+    await stop(server)
+  } finally {
+    process.env.OPENCODE_API_KEY = oldKey
+    await new Promise((r) => mock.close(r))
+  }
+})
+
+test("go-qwen fetch path keeps last good analysis on empty response", async () => {
+  let calls = 0
+  const mock = http.createServer((req, res) => {
+    calls++
+    let body = ""
+    req.on("data", (c) => (body += c))
+    req.on("end", () => {
+      res.writeHead(200, { "Content-Type": "application/json" }).end(
+        JSON.stringify({
+          choices: [
+            {
+              message: {
+                role: "assistant",
+                content: calls === 1 ? "boa análise" : "",
+              },
+            },
+          ],
+        }),
+      )
+    })
+  })
+
+  await new Promise((r) => mock.listen(0, "127.0.0.1", r))
+  const mockBase = `http://127.0.0.1:${mock.address().port}`
+
+  const oldKey = process.env.OPENCODE_API_KEY
+  process.env.OPENCODE_API_KEY = "key"
+  try {
+    const { server, base, dir } = await start({
+      every: 25,
+      llm: {
+        url: `${mockBase}/v1/chat/completions`,
+        model: "qwen3.7-plus",
+        thinking: { type: "disabled" },
+      },
+    })
+    const state = () => fetch(`${base}/m/${ID1}/state`).then((r) => r.json())
+
+    await postCaption(base, ID1, { id: "u1", speaker: "A", text: "olá" })
+    await until(async () => (await state()).analysis)
+
+    await postCaption(base, ID1, { id: "u2", speaker: "B", text: "oi" })
+    await until(() => calls === 2)
+    await new Promise((r) => setTimeout(r, 100))
+
+    assert.equal((await state()).analysis, "boa análise")
+    const date = new Date().toISOString().slice(0, 10)
+    assert.equal(
+      fs.readFileSync(path.join(dir, `${date}-${ID1}`, "analysis.txt"), "utf8"),
+      "boa análise",
+    )
+
+    await stop(server)
+  } finally {
+    process.env.OPENCODE_API_KEY = oldKey
+    await new Promise((r) => mock.close(r))
+  }
 })
 
 test("getSession recovers analysis.txt and updatedAt on rejoin", async () => {
