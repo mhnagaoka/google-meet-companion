@@ -1,9 +1,11 @@
 ---
 id: GMC-018
 title: 'Add go-qwen strategy: direct zen API analysis (no coding-agent overhead)'
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@opencode'
 created_date: '2026-07-16 12:54'
+updated_date: '2026-07-16 13:01'
 labels: []
 dependencies: []
 ordinal: 17000
@@ -32,6 +34,12 @@ Chosen default among tested models (Jul 2026, ~12k-token real transcript): qwen3
 - [ ] #7 Missing key only errors when go-qwen is the selected strategy
 - [ ] #8 No session/history files are created on disk by the go-qwen path
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Add go-qwen strategy object to CLIS with zen endpoint url/model/thinking config.\n2. Add loadApiKey() helper reading OPENCODE_API_KEY env or ~/.local/share/opencode/auth.json.\n3. Extract applyAnalysis(s, out) for shared output handling between spawn and fetch paths.\n4. Refactor analyze() to branch on llm.url: fetch path builds OpenAI-compatible body, parses choices[0].message.content, and funnels through applyAnalysis.\n5. Keep spawn path unchanged except routing through applyAnalysis.\n6. Add unit test for fetch path using a local mock endpoint and OPENCODE_API_KEY override.\n7. Run npm test and npm run check; commit on gmc-018.
+<!-- SECTION:PLAN:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
