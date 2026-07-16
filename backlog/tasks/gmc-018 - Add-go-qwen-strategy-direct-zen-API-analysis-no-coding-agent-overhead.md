@@ -1,11 +1,11 @@
 ---
 id: GMC-018
 title: 'Add go-qwen strategy: direct zen API analysis (no coding-agent overhead)'
-status: In Progress
+status: Done
 assignee:
   - '@opencode'
 created_date: '2026-07-16 12:54'
-updated_date: '2026-07-16 13:04'
+updated_date: '2026-07-16 13:07'
 labels: []
 dependencies: []
 ordinal: 17000
@@ -35,8 +35,6 @@ Chosen default among tested models (Jul 2026, ~12k-token real transcript): qwen3
 - [x] #8 No session/history files are created on disk by the go-qwen path
 <!-- AC:END -->
 
-
-
 ## Implementation Plan
 
 <!-- SECTION:PLAN:BEGIN -->
@@ -49,12 +47,18 @@ Chosen default among tested models (Jul 2026, ~12k-token real transcript): qwen3
 Implemented go-qwen strategy in server.js with direct fetch to zen endpoint, shared applyAnalysis helper, and auth key resolution. Added two unit tests covering the fetch path (success and empty-response fallback). npm test passes (18/18); npm run check exits clean (remaining infos are in pre-existing files).
 <!-- SECTION:NOTES:END -->
 
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added the go-qwen analysis strategy: node server.js go-qwen posts the transcript prompt directly to opencode's zen Go chat/completions endpoint (qwen3.7-plus, thinking:{type:disabled}) instead of spawning a coding-agent CLI. analyze() is now async and branches on llm.url; a shared applyAnalysis(s,out) funnels both spawn and fetch output handling (trim, empty-guard keeps last good analysis, set s.analysis/updatedAt, write analysis.txt). Bearer key resolves from OPENCODE_API_KEY then ~/.local/share/opencode/auth.json [opencode-go].key, read only when go-qwen is selected so claude/opencode still boot keyless. Two unit tests cover the fetch path (success + empty-response fallback) via a local mock endpoint. README + PRD updated to document the new strategy and its key source. Implemented by opencode/Kimi on branch gmc-018; docs added by lead in review. npm test 18/18, biome clean.
+<!-- SECTION:FINAL_SUMMARY:END -->
+
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No linting errors
-- [ ] #2 All unit tests passing
-- [ ] #3 Code is reviewed by ponytail
-- [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
-- [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
-- [ ] #6 Branch merged to main with git merge --no-ff
+- [x] #1 No linting errors
+- [x] #2 All unit tests passing
+- [x] #3 Code is reviewed by ponytail
+- [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
+- [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
+- [x] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
