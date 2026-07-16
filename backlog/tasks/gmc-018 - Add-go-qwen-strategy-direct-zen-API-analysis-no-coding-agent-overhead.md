@@ -26,14 +26,16 @@ Chosen default among tested models (Jul 2026, ~12k-token real transcript): qwen3
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 node server.js go-qwen selects a strategy that calls the zen Go chat/completions endpoint (not a spawned CLI) using qwen3.7-plus
-- [ ] #2 The request disables reasoning via thinking:{type:disabled} in the JSON body
-- [ ] #3 The bearer key is read from ~/.local/share/opencode/auth.json [opencode-go].key, and OPENCODE_API_KEY overrides it when set
-- [ ] #4 The fetch path parses choices[0].message.content and, on HTTP/parse failure or empty content, keeps the last good analysis (parity with the spawn path)
-- [ ] #5 Spawn and fetch paths share one applyAnalysis(s,out) that trims, sets s.analysis/updatedAt, and writes analysis.txt
-- [ ] #6 Existing claude (default) and opencode strategies are unchanged; the server still boots for them when no key is present
-- [ ] #7 Missing key only errors when go-qwen is the selected strategy
-- [ ] #8 No session/history files are created on disk by the go-qwen path
+- [x] #2 The request disables reasoning via thinking:{type:disabled} in the JSON body
+- [x] #3 The bearer key is read from ~/.local/share/opencode/auth.json [opencode-go].key, and OPENCODE_API_KEY overrides it when set
+- [x] #4 The fetch path parses choices[0].message.content and, on HTTP/parse failure or empty content, keeps the last good analysis (parity with the spawn path)
+- [x] #5 Spawn and fetch paths share one applyAnalysis(s,out) that trims, sets s.analysis/updatedAt, and writes analysis.txt
+- [x] #6 Existing claude (default) and opencode strategies are unchanged; the server still boots for them when no key is present
+- [x] #7 Missing key only errors when go-qwen is the selected strategy
+- [x] #8 No session/history files are created on disk by the go-qwen path
 <!-- AC:END -->
+
+
 
 ## Implementation Plan
 
