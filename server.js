@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process"
 import fs from "node:fs"
 import http from "node:http"
+import os from "node:os"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -22,6 +23,23 @@ export const CLIS = {
     args: ["-p", "--model", "sonnet", "--effort", "low"],
   },
   opencode: { cmd: "opencode", args: ["run"] },
+  "go-qwen": {
+    url: "https://opencode.ai/zen/go/v1/chat/completions",
+    model: "qwen3.7-plus",
+    thinking: { type: "disabled" },
+  },
+}
+
+const AUTH_PATH = path.join(os.homedir(), ".local/share/opencode/auth.json")
+
+function loadApiKey() {
+  if (process.env.OPENCODE_API_KEY) return process.env.OPENCODE_API_KEY
+  try {
+    const raw = fs.readFileSync(AUTH_PATH, "utf8")
+    return JSON.parse(raw)?.["opencode-go"]?.key ?? ""
+  } catch {
+    return ""
+  }
 }
 
 const PROMPT = `Você é um copiloto de reunião. Abaixo está a transcrição parcial de uma reunião
@@ -240,10 +258,56 @@ export function createApp({
     return text
   }
 
-  function analyze(s) {
+  function applyAnalysis(s, out) {
+    out = out.trim()
+    if (!out) return // killed or empty: keep the last good analysis
+    s.analysis = out
+    s.updatedAt = new Date().toISOString()
+    try {
+      fs.writeFileSync(path.join(s.dir, "analysis.txt"), out)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  async function analyze(s) {
     s.dirty = false
     s.inflight = true
     const transcript = writeTranscript(s)
+    const prior = s.analysis ? `${PRIOR}\n${s.analysis}\n\n` : ""
+    const prompt = `${PROMPT}\n\n${prior}Transcrição:\n${transcript}`
+
+    if (llm.url) {
+      const key = loadApiKey()
+      if (!key) {
+        s.inflight = false
+        console.error(new Error(`Missing OPENCODE_API_KEY or ${AUTH_PATH}`))
+        return
+      }
+      try {
+        const res = await fetch(llm.url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${key}`,
+          },
+          body: JSON.stringify({
+            model: llm.model,
+            messages: [{ role: "user", content: prompt }],
+            thinking: llm.thinking,
+          }),
+        })
+        if (!res.ok) throw new Error(`zen HTTP ${res.status}`)
+        const data = await res.json()
+        applyAnalysis(s, data.choices?.[0]?.message?.content ?? "")
+      } catch (err) {
+        console.error(err)
+      } finally {
+        s.inflight = false
+      }
+      return
+    }
+
     const child = spawn(llm.cmd, llm.args, {
       // Hang guard only (~5 min), not an interval-fitter: a wedged CLI can't
       // hold inflight forever, but a slow-working run is left alone.
@@ -258,18 +322,10 @@ export function createApp({
     child.stdin.on("error", () => {}) // EPIPE when the CLI dies before reading
     child.on("close", (code) => {
       s.inflight = false
-      out = out.trim()
-      if (code !== 0 || !out) return // killed or empty: keep the last good analysis
-      s.analysis = out
-      s.updatedAt = new Date().toISOString()
-      try {
-        fs.writeFileSync(path.join(s.dir, "analysis.txt"), out)
-      } catch (err) {
-        console.error(err)
-      }
+      if (code !== 0) return // killed: keep the last good analysis
+      applyAnalysis(s, out)
     })
-    const prior = s.analysis ? `${PRIOR}\n${s.analysis}\n\n` : ""
-    child.stdin.end(`${PROMPT}\n\n${prior}Transcrição:\n${transcript}`)
+    child.stdin.end(prompt)
   }
 
   async function handle(req, res) {

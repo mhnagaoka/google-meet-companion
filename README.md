@@ -11,9 +11,12 @@ See [`docs/PRD.md`](docs/PRD.md) for the full design and
 ## Prerequisites
 
 - **Node.js >= 24** (uses stdlib-only ESM; no runtime dependencies).
-- **An LLM CLI** on your `PATH`, one of:
-  - `claude` (default) — invoked as `claude -p --model sonnet --effort low`.
-  - `opencode` — invoked as `opencode run`.
+- **A backend** for the analysis loop, one of:
+  - `claude` (default) — CLI, invoked as `claude -p --model sonnet --effort low`.
+  - `opencode` — CLI, invoked as `opencode run`.
+  - `go-qwen` — direct HTTP call to opencode's zen Go endpoint (`qwen3.7-plus`,
+    reasoning off), no CLI spawned. Needs a key: `OPENCODE_API_KEY`, or
+    `~/.local/share/opencode/auth.json` → `["opencode-go"].key`.
 - **Google Chrome** (or a Chromium browser) to run the bookmarklet.
 
 ## Setup
@@ -34,6 +37,7 @@ blob you install below.
 npm start            # uses the claude CLI
 # or pick a backend:
 node server.js opencode
+node server.js go-qwen   # direct zen API call; needs OPENCODE_API_KEY or auth.json
 ```
 
 The server listens on `http://127.0.0.1:8737` (localhost only — transcripts are

@@ -1,9 +1,11 @@
 ---
 id: GMC-018
 title: 'Add go-qwen strategy: direct zen API analysis (no coding-agent overhead)'
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@opencode'
 created_date: '2026-07-16 12:54'
+updated_date: '2026-07-16 13:04'
 labels: []
 dependencies: []
 ordinal: 17000
@@ -23,15 +25,29 @@ Chosen default among tested models (Jul 2026, ~12k-token real transcript): qwen3
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 node server.js go-qwen selects a strategy that calls the zen Go chat/completions endpoint (not a spawned CLI) using qwen3.7-plus
-- [ ] #2 The request disables reasoning via thinking:{type:disabled} in the JSON body
-- [ ] #3 The bearer key is read from ~/.local/share/opencode/auth.json [opencode-go].key, and OPENCODE_API_KEY overrides it when set
-- [ ] #4 The fetch path parses choices[0].message.content and, on HTTP/parse failure or empty content, keeps the last good analysis (parity with the spawn path)
-- [ ] #5 Spawn and fetch paths share one applyAnalysis(s,out) that trims, sets s.analysis/updatedAt, and writes analysis.txt
-- [ ] #6 Existing claude (default) and opencode strategies are unchanged; the server still boots for them when no key is present
-- [ ] #7 Missing key only errors when go-qwen is the selected strategy
-- [ ] #8 No session/history files are created on disk by the go-qwen path
+- [x] #1 node server.js go-qwen selects a strategy that calls the zen Go chat/completions endpoint (not a spawned CLI) using qwen3.7-plus
+- [x] #2 The request disables reasoning via thinking:{type:disabled} in the JSON body
+- [x] #3 The bearer key is read from ~/.local/share/opencode/auth.json [opencode-go].key, and OPENCODE_API_KEY overrides it when set
+- [x] #4 The fetch path parses choices[0].message.content and, on HTTP/parse failure or empty content, keeps the last good analysis (parity with the spawn path)
+- [x] #5 Spawn and fetch paths share one applyAnalysis(s,out) that trims, sets s.analysis/updatedAt, and writes analysis.txt
+- [x] #6 Existing claude (default) and opencode strategies are unchanged; the server still boots for them when no key is present
+- [x] #7 Missing key only errors when go-qwen is the selected strategy
+- [x] #8 No session/history files are created on disk by the go-qwen path
 <!-- AC:END -->
+
+
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Add go-qwen strategy object to CLIS with zen endpoint url/model/thinking config.\n2. Add loadApiKey() helper reading OPENCODE_API_KEY env or ~/.local/share/opencode/auth.json.\n3. Extract applyAnalysis(s, out) for shared output handling between spawn and fetch paths.\n4. Refactor analyze() to branch on llm.url: fetch path builds OpenAI-compatible body, parses choices[0].message.content, and funnels through applyAnalysis.\n5. Keep spawn path unchanged except routing through applyAnalysis.\n6. Add unit test for fetch path using a local mock endpoint and OPENCODE_API_KEY override.\n7. Run npm test and npm run check; commit on gmc-018.
+<!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Implemented go-qwen strategy in server.js with direct fetch to zen endpoint, shared applyAnalysis helper, and auth key resolution. Added two unit tests covering the fetch path (success and empty-response fallback). npm test passes (18/18); npm run check exits clean (remaining infos are in pre-existing files).
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
