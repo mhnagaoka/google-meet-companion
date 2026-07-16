@@ -51,9 +51,9 @@ Meet captions hand us, for free, the two hardest parts of an audio pipeline:
 |---|---|---|
 | Capture | Meet captions only | No audio pipeline |
 | Server | Node.js, stdlib `http` only | No framework, dep-free |
-| LLM | shell out to `claude` / `opencode` CLI | No API key to manage |
+| LLM | shell out to `claude` / `opencode` CLI, or direct HTTP to zen (`go-qwen`) | CLIs need no API key; `go-qwen` reads one from env/auth.json |
 | UI refresh | browser polls `GET /m/<id>/state` | SSE only if polling proves twitchy |
-| Session model | one long-lived server, keyed by Meet code | Tracks many meetings at once; `node server.js [claude\|opencode]`, no title arg |
+| Session model | one long-lived server, keyed by Meet code | Tracks many meetings at once; `node server.js [claude\|opencode\|go-qwen]`, no title arg |
 
 ## Components
 
@@ -312,7 +312,8 @@ timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
 |---|---|---|
 | `PORT` | `8737` | server port / page URL |
 | `ANALYZE_EVERY` | `120` | seconds between analyses per session (practical floor ~60) |
-| arg 1 | `claude` | `claude` (sonnet, low effort) or `opencode` |
+| arg 1 | `claude` | `claude` (sonnet, low effort), `opencode`, or `go-qwen` (direct zen API, `qwen3.7-plus` reasoning off) |
+| `OPENCODE_API_KEY` | — | bearer key for `go-qwen`; overrides `~/.local/share/opencode/auth.json` → `["opencode-go"].key` |
 
 Meeting id and title come from the bookmarklet per-POST — no server-side title arg.
 
