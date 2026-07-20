@@ -1,7 +1,7 @@
 ---
-id: DRAFT-004
+id: GMC-020
 title: Persistir perguntas sugeridas ainda sem resposta entre rodadas de análise
-status: Draft
+status: To Do
 assignee: []
 created_date: '2026-07-20 19:13'
 labels: []
