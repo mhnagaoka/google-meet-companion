@@ -4,6 +4,7 @@ title: Persistir perguntas sugeridas ainda sem resposta entre rodadas de anális
 status: To Do
 assignee: []
 created_date: '2026-07-20 19:13'
+updated_date: '2026-07-20 19:32'
 labels: []
 dependencies: []
 ---
@@ -33,12 +34,7 @@ Ajuste apenas de prompt, sem código novo. Opções discutidas:
 
 Em ambos os casos é preciso abrir exceção no texto do PRIOR, que hoje manda re-derivar tudo além de nomes/seção 6.
 
-## Acceptance Criteria
-
-- [ ] Perguntas sugeridas ainda sem resposta reaparecem em rodadas seguintes até serem respondidas ou perderem relevância
-- [ ] Perguntas novas na rodada atual ficam distinguíveis das carregadas de rodadas anteriores
-- [ ] O texto do PRIOR deixa de proibir o uso da análise anterior para perguntas sugeridas
-- [ ] Mudança é apenas no prompt (PROMPT/PRIOR em server.js), sem novo código de estado/parsing
+Nota: discussão posterior sugeriu generalizar isto para um ciclo de vida das seções-ledger (3/4/5) com marcação de status inline e poda — ver a linha de trabalho relacionada. Esta task cobre o recorte das perguntas.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Definition of Done
