@@ -46,3 +46,11 @@ Nota: discussão posterior sugeriu generalizar isto para um ciclo de vida das se
 - [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
+
+## Acceptance Criteria
+<!-- AC:BEGIN -->
+- [ ] #1 Perguntas sugeridas ainda sem resposta reaparecem em rodadas seguintes até serem respondidas ou perderem relevância
+- [ ] #2 Perguntas novas na rodada atual ficam distinguíveis das carregadas de rodadas anteriores
+- [ ] #3 O texto do PRIOR deixa de proibir o uso da análise anterior para perguntas sugeridas
+- [ ] #4 Mudança é apenas no prompt (PROMPT/PRIOR em server.js), sem novo código de estado/parsing
+<!-- AC:END -->
