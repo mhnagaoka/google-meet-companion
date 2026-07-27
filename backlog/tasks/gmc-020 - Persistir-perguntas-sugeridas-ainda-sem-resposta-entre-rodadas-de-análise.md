@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@mau'
 created_date: '2026-07-20 19:13'
-updated_date: '2026-07-27 13:01'
+updated_date: '2026-07-27 13:03'
 labels: []
 dependencies: []
 ---
@@ -64,4 +64,6 @@ Prompt-only. Seção 5 do PROMPT agora manda carregar perguntas ainda em aberto 
 Correção de rigor: AC #1 e #2 são comportamentais (dependem do LLM obedecer o prompt) e foram marcados sem evidência. Os 18 testes cobrem mecânica (dirty gating, injeção de prompt), não o conteúdo gerado. Desmarcados até verificação em execução real com transcrição de duas rodadas.
 
 Verificado em execução real (claude -p --model sonnet, path de produção; n=1) com transcrição de duas rodadas — gateway/volume em aberto. AC#1: as 2 perguntas em aberto da rodada 1 reapareceram na rodada 2; uma pergunta que perdeu relevância foi podada (seção 6 justificou). AC#2: só as genuinamente novas vieram com '(nova)'; as carregadas sem marca, e as que eram novas na rodada 1 perderam a marca na 2. Ciclo de vida do prompt funciona.
+
+Confirmação n=2 com go-qwen (qwen3.7-plus via zen, uso diário do usuário): mesmo cenário de duas rodadas. AC#1: as 3 perguntas em aberto da rodada 1 reapareceram na rodada 2; ponta solta de design (mockups aprovados) movida corretamente para 'Resolvido' na seção 6. AC#2: qwen marcou as 3 carregadas com '(carregada)' e as 2 novas com '(nova)' — distinção explícita nos dois lados. Comportamento robusto entre sonnet e qwen.
 <!-- SECTION:NOTES:END -->
