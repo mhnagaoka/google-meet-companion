@@ -12,11 +12,13 @@ Every code change, however small, must be tied to a Backlog task — if none exi
 
 Implement each Backlog task on its own branch named after the task id (e.g. `gmc-999`), branched from `main`. When the task is done, merge with `git merge --no-ff` into `main`.
 
-Create the branch first — `git checkout -b gmc-999` off `main` **before** the first `backlog` edit for the task, including setting it In Progress. The very first task edit autocommits immediately (see below), so if you haven't branched yet it lands on `main` instead of the branch.
+Branch *before you start the work* — before setting the task In Progress or making the first code commit — **not** before creating the task. Registering a demand (creating the task) and starting work (creating the branch) are separate events with separate homes: a cold task is created on `main`, so its id is assigned there and you then `git checkout -b gmc-999` off `main` with the id in hand; a task discovered mid-work on another branch may be created on that branch instead (see "Findings During Execution"). The `backlog` CLI consolidates tasks across active branches, so a task created on a branch stays visible before the merge.
+
+What must never land on `main` is In-Progress/code work. The first *progress* edit (setting In Progress) autocommits immediately, so the branch has to exist before that — the In Progress edit, not the create, is the gate.
 
 Mark the task Done only after the merge: code commits and in-progress task updates go on the branch, then merge into `main`, then set the task to Done (plus finalization notes) and commit that on `main`. Done means the work is reachable from `main`.
 
-The `backlog` CLI auto-commits its task-file changes to the current branch (`autoCommit: true` in the backlog config) — never stage `backlog/` files manually, and be on the right branch when editing a task, since the commit lands immediately.
+The `backlog` CLI auto-commits its task-file changes to the current branch (`autoCommit: true` in the backlog config) — never stage `backlog/` files manually, and be on the intended branch before the In Progress edit, since the commit lands immediately.
 
 ## Commits
 
