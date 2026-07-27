@@ -1,10 +1,11 @@
 ---
 id: GMC-020
 title: Persistir perguntas sugeridas ainda sem resposta entre rodadas de análise
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@mau'
 created_date: '2026-07-20 19:13'
-updated_date: '2026-07-20 19:32'
+updated_date: '2026-07-27 12:56'
 labels: []
 dependencies: []
 ---
