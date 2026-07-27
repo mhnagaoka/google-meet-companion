@@ -56,6 +56,18 @@ Do not edit Backlog task, draft, document, decision, or milestone markdown files
 </CRITICAL_INSTRUCTION>
 <!-- BACKLOG.MD GUIDELINES END -->
 
+## Marking acceptance criteria
+
+Checking an AC asserts it is true — so name the specific evidence for *that* AC when you check it. A green test suite is not evidence for an AC it does not exercise; "all tests pass" only counts when you name *which* test covers *which* AC.
+
+Three kinds of AC, by what proves them:
+
+- **Static** — the proof is the diff, file, or line (e.g. "the prompt no longer forbids X", "no new code"). Verify by pointing at it.
+- **Automatable** — the proof is a test that goes red if the behavior breaks.
+- **Behavioral/empirical** — the behavior only exists at runtime (an LLM obeying a prompt, a network/clock/hardware effect); no unit test touches it. The proof is a recorded observation. Record the method and n (e.g. "verified n=2, non-deterministic: sonnet + go-qwen, both reappeared") and the regression mechanism (prompt-governed → may break with no test going red).
+
+n=0 disguised as green is the exact failure this prevents: never check a behavioral AC just because the mechanics tests pass.
+
 ## Findings During Execution
 
 If work on a task surfaces something out of scope that deserves investigation, don't expand the current task. Create a Backlog draft (or a task, for clear bugs), reference it in the current task's implementation notes, and flag it to the user at wrap-up. If a finding invalidates the current task's plan or acceptance criteria, surface it immediately and update the task. Only interrupt mid-task for blockers.
