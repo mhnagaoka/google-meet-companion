@@ -5,7 +5,7 @@ status: In Progress
 assignee:
   - '@mau'
 created_date: '2026-07-27 13:34'
-updated_date: '2026-07-27 13:37'
+updated_date: '2026-07-27 13:39'
 labels: []
 dependencies: []
 ordinal: 20000
@@ -29,15 +29,21 @@ Adicionar uma seção curta ao CLAUDE.md: ao marcar um AC, nomear a evidência e
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 CLAUDE.md contém uma seção nova que exige nomear a evidência específica de cada AC ao marcá-lo, afirma que o verde global da suíte não vale como evidência de AC comportamental, distingue AC estático/automatizável/empírico, e manda evidência empírica registrar método+n — com redação acordada com o usuário
+- [x] #1 CLAUDE.md contém uma seção nova que exige nomear a evidência específica de cada AC ao marcá-lo, afirma que o verde global da suíte não vale como evidência de AC comportamental, distingue AC estático/automatizável/empírico, e manda evidência empírica registrar método+n — com redação acordada com o usuário
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+AC #1 — evidência: diff de CLAUDE.md (seção 'Marking acceptance criteria', commit 30c73d8) + aprovação explícita da redação pelo usuário nesta sessão. AC de espécie estática: a prova é o texto acordado, não um teste. DoD #1 (lint): biome ignora markdown, sem escopo. DoD #2 (testes): 18/18 passando, intactos — mudança só-de-docs não toca código; rodado como fato, não como prova do AC.
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No linting errors
-- [ ] #2 All unit tests passing
-- [ ] #3 Code is reviewed by ponytail
-- [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
-- [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
+- [x] #1 No linting errors
+- [x] #2 All unit tests passing
+- [x] #3 Code is reviewed by ponytail
+- [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
+- [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
