@@ -5,7 +5,7 @@ status: Done
 assignee:
   - '@mau'
 created_date: '2026-07-20 19:13'
-updated_date: '2026-07-27 12:56'
+updated_date: '2026-07-27 13:00'
 labels: []
 dependencies: []
 ---
@@ -48,12 +48,10 @@ Nota: discussão posterior sugeriu generalizar isto para um ciclo de vida das se
 - [x] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
 
-
-
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [x] #1 Perguntas sugeridas ainda sem resposta reaparecem em rodadas seguintes até serem respondidas ou perderem relevância
-- [x] #2 Perguntas novas na rodada atual ficam distinguíveis das carregadas de rodadas anteriores
+- [ ] #1 Perguntas sugeridas ainda sem resposta reaparecem em rodadas seguintes até serem respondidas ou perderem relevância
+- [ ] #2 Perguntas novas na rodada atual ficam distinguíveis das carregadas de rodadas anteriores
 - [x] #3 O texto do PRIOR deixa de proibir o uso da análise anterior para perguntas sugeridas
 - [x] #4 Mudança é apenas no prompt (PROMPT/PRIOR em server.js), sem novo código de estado/parsing
 <!-- AC:END -->
@@ -62,4 +60,6 @@ Nota: discussão posterior sugeriu generalizar isto para um ciclo de vida das se
 
 <!-- SECTION:NOTES:BEGIN -->
 Prompt-only. Seção 5 do PROMPT agora manda carregar perguntas ainda em aberto da análise anterior e marcar novas com '(nova)'. PRIOR deixou de proibir usar a análise anterior para perguntas (antes: 're-derive todo o resto'). Sem código novo. 18/18 testes passam, biome limpo.
+
+Correção de rigor: AC #1 e #2 são comportamentais (dependem do LLM obedecer o prompt) e foram marcados sem evidência. Os 18 testes cobrem mecânica (dirty gating, injeção de prompt), não o conteúdo gerado. Desmarcados até verificação em execução real com transcrição de duas rodadas.
 <!-- SECTION:NOTES:END -->
