@@ -52,11 +52,11 @@ Responda em português, conciso, em tópicos:
 2. **Alerta de tempo** — algum tópico está consumindo tempo demais?
 3. **Contradições / pontas soltas** — afirmações conflitantes ou questões levantadas e não resolvidas
 4. **Decisões e ações** — o que já foi decidido ou atribuído
-5. **Perguntas sugeridas** — 2-3 perguntas que 'You' poderia fazer agora para esclarecer pontas soltas, destravar decisões ou expor contradições
+5. **Perguntas sugeridas** — perguntas que 'You' poderia fazer para esclarecer pontas soltas, destravar decisões ou expor contradições. Carregue as perguntas ainda em aberto da análise anterior (que não foram respondidas nem perderam relevância) e some 2-3 novas conforme a transcrição avançou. Marque cada pergunta nova com '(nova)'
 6. **Desde a última análise** — o que mudou: tópicos novos, pontas soltas resolvidas, alertas que deixaram de valer`
 
-const PRIOR = `Sua análise anterior (use-a só para manter nomes de tópicos consistentes e calcular
-a seção 6 — re-derive todo o resto da transcrição):`
+const PRIOR = `Sua análise anterior (use-a para manter nomes de tópicos consistentes, calcular
+a seção 6 e carregar as perguntas ainda em aberto da seção 5 — re-derive o resto da transcrição):`
 
 // Constant shell, identical bytes for every id.
 const SHELL = fs.readFileSync(new URL("./index.html", import.meta.url), "utf8")
