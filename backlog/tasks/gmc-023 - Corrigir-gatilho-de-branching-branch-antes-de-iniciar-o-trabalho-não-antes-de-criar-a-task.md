@@ -3,9 +3,11 @@ id: GMC-023
 title: >-
   Corrigir gatilho de branching: branch antes de iniciar o trabalho, não antes
   de criar a task
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@mau'
 created_date: '2026-07-27 13:52'
+updated_date: '2026-07-27 13:52'
 labels: []
 dependencies: []
 ordinal: 21000
