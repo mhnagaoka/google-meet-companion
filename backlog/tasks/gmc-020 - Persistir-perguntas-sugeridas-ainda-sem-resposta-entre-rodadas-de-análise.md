@@ -1,7 +1,7 @@
 ---
 id: GMC-020
 title: Persistir perguntas sugeridas ainda sem resposta entre rodadas de análise
-status: In Progress
+status: Done
 assignee:
   - '@mau'
 created_date: '2026-07-20 19:13'
@@ -44,9 +44,11 @@ Nota: discussão posterior sugeriu generalizar isto para um ciclo de vida das se
 - [x] #2 All unit tests passing
 - [x] #3 Code is reviewed by ponytail
 - [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
-- [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
-- [ ] #6 Branch merged to main with git merge --no-ff
+- [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
+- [x] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
+
+
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
