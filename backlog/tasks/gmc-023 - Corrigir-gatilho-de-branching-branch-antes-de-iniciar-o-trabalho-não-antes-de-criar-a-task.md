@@ -3,9 +3,11 @@ id: GMC-023
 title: >-
   Corrigir gatilho de branching: branch antes de iniciar o trabalho, não antes
   de criar a task
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@mau'
 created_date: '2026-07-27 13:52'
+updated_date: '2026-07-27 13:54'
 labels: []
 dependencies: []
 ordinal: 21000
@@ -33,15 +35,21 @@ Reformular a seção 'Branching': o gatilho de criar a branch passa a ser 'antes
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Seção 'Branching' do CLAUDE.md reformulada de modo que: (a) o gatilho de criar a branch é 'antes de In Progress / primeiro commit de código', não 'antes do primeiro backlog edit'; (b) reconhece explicitamente que uma task detectada durante o trabalho em outra pode ser criada na branch em curso, alinhado com 'Findings During Execution'; (c) mantém merge --no-ff e Done-na-main inalterados — com redação acordada com o usuário
+- [x] #1 Seção 'Branching' do CLAUDE.md reformulada de modo que: (a) o gatilho de criar a branch é 'antes de In Progress / primeiro commit de código', não 'antes do primeiro backlog edit'; (b) reconhece explicitamente que uma task detectada durante o trabalho em outra pode ser criada na branch em curso, alinhado com 'Findings During Execution'; (c) mantém merge --no-ff e Done-na-main inalterados — com redação acordada com o usuário
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+AC #1 — evidência: diff da seção 'Branching' em CLAUDE.md (commit bfe1beb) + aprovação explícita da redação pelo usuário nesta sessão. AC estático: prova é o texto acordado, não um teste. DoD #1 (lint): biome ignora markdown, sem escopo. DoD #2: 18/18 passando, intactos (só-de-docs).
+<!-- SECTION:NOTES:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No linting errors
-- [ ] #2 All unit tests passing
-- [ ] #3 Code is reviewed by ponytail
-- [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
-- [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
+- [x] #1 No linting errors
+- [x] #2 All unit tests passing
+- [x] #3 Code is reviewed by ponytail
+- [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
+- [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
