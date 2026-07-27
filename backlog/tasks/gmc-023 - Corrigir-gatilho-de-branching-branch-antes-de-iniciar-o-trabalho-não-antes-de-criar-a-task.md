@@ -3,7 +3,7 @@ id: GMC-023
 title: >-
   Corrigir gatilho de branching: branch antes de iniciar o trabalho, não antes
   de criar a task
-status: In Progress
+status: Done
 assignee:
   - '@mau'
 created_date: '2026-07-27 13:52'
@@ -42,7 +42,15 @@ Reformular a seção 'Branching': o gatilho de criar a branch passa a ser 'antes
 
 <!-- SECTION:NOTES:BEGIN -->
 AC #1 — evidência: diff da seção 'Branching' em CLAUDE.md (commit bfe1beb) + aprovação explícita da redação pelo usuário nesta sessão. AC estático: prova é o texto acordado, não um teste. DoD #1 (lint): biome ignora markdown, sem escopo. DoD #2: 18/18 passando, intactos (só-de-docs).
+
+Eficácia (hipótese, NÃO é AC): replay retrospectivo contra os 8 casos gmc-015..022. Sob o texto novo todos ficam consistentes — fria→main→branch (7 casos) e mid-work→branch (o padrão de Findings) ambos legais; o único que era 'certo' sob o texto velho (gmc-022, branch-antes-do-create) é o que carregava a adivinhação de id. Esta própria task estreou a regra: criada na main (fria), id GMC-023 atribuído ali, branch depois — sem adivinhar. n=1 retrospectivo + n=1 ao vivo (esta task), determinístico. Não prova ausência de caso de borda futuro; discrimina o problema diagnosticado.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Seção 'Branching' do CLAUDE.md reformulada: gatilho de criar a branch passa a ser 'antes de In Progress / primeiro código', não 'antes do primeiro backlog edit'. Separa registrar demanda (create, na main se fria ou na branch em curso se mid-work) de iniciar trabalho (branch). Resolve a contradição com 'Findings During Execution' e elimina a adivinhação de id. Verificado pelo diff + aprovação do usuário; eficácia por replay retrospectivo (8 casos) e pela própria criação desta task.
+<!-- SECTION:FINAL_SUMMARY:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
@@ -51,5 +59,5 @@ AC #1 — evidência: diff da seção 'Branching' em CLAUDE.md (commit bfe1beb) 
 - [x] #3 Code is reviewed by ponytail
 - [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
 - [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
-- [ ] #6 Branch merged to main with git merge --no-ff
+- [x] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
