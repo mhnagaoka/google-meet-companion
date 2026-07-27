@@ -1,9 +1,11 @@
 ---
 id: GMC-022
 title: 'Regra de finalização: cada AC marcado nomeia sua evidência'
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@mau'
 created_date: '2026-07-27 13:34'
+updated_date: '2026-07-27 13:37'
 labels: []
 dependencies: []
 ordinal: 20000
