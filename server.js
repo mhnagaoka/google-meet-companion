@@ -25,7 +25,7 @@ export const CLIS = {
   opencode: { cmd: "opencode", args: ["run"] },
   "go-qwen": {
     url: "https://opencode.ai/zen/go/v1/chat/completions",
-    model: "qwen3.7-plus",
+    model: "qwen3.8-flash",
     thinking: { type: "disabled" },
   },
 }

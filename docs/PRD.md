@@ -312,7 +312,7 @@ timeline: [`../dev/dom-behavior.md`](../dev/dom-behavior.md).**
 |---|---|---|
 | `PORT` | `8737` | server port / page URL |
 | `ANALYZE_EVERY` | `120` | seconds between analyses per session (practical floor ~60) |
-| arg 1 | `claude` | `claude` (sonnet, low effort), `opencode`, or `go-qwen` (direct zen API, `qwen3.7-plus` reasoning off) |
+| arg 1 | `claude` | `claude` (sonnet, low effort), `opencode`, or `go-qwen` (direct zen API, `qwen3.8-flash` reasoning off) |
 | `OPENCODE_API_KEY` | — | bearer key for `go-qwen`; overrides `~/.local/share/opencode/auth.json` → `["opencode-go"].key` |
 
 Meeting id and title come from the bookmarklet per-POST — no server-side title arg.

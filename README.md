@@ -14,7 +14,7 @@ See [`docs/PRD.md`](docs/PRD.md) for the full design and
 - **A backend** for the analysis loop, one of:
   - `claude` (default) — CLI, invoked as `claude -p --model sonnet --effort low`.
   - `opencode` — CLI, invoked as `opencode run`.
-  - `go-qwen` — direct HTTP call to opencode's zen Go endpoint (`qwen3.7-plus`,
+  - `go-qwen` — direct HTTP call to opencode's zen Go endpoint (`qwen3.8-flash`,
     reasoning off), no CLI spawned. Needs a key: `OPENCODE_API_KEY`, or
     `~/.local/share/opencode/auth.json` → `["opencode-go"].key`.
 - **Google Chrome** (or a Chromium browser) to run the bookmarklet.
