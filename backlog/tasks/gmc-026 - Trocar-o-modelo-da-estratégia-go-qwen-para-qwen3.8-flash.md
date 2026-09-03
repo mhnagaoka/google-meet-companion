@@ -1,9 +1,11 @@
 ---
 id: GMC-026
 title: Trocar o modelo da estratégia go-qwen para qwen3.8-flash
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-09-03 12:43'
+updated_date: '2026-09-03 12:43'
 labels: []
 dependencies:
   - GMC-025
@@ -31,3 +33,12 @@ A GMC-025 rodou o mesmo transcript real por quatro modelos da zen API em lockste
 - [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Trocar o model id em CLIS['go-qwen'] de qwen3.7-plus para qwen3.8-flash (server.js:26) — uma linha
+2. Atualizar as duas menções em docs (README.md:17 e docs/PRD.md:315), que citam o modelo pelo nome
+3. Não mexer em server.test.js: os testes do caminho go-qwen montam o próprio objeto llm e afirmam o pass-through do model id, sem importar CLIS — já são independentes do nome
+4. npx biome check . e npm test
+<!-- SECTION:PLAN:END -->
