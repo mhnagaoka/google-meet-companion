@@ -1,7 +1,7 @@
 ---
 id: GMC-026
 title: Trocar o modelo da estratégia go-qwen para qwen3.8-flash
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-09-03 12:43'
@@ -31,7 +31,7 @@ A GMC-025 rodou o mesmo transcript real por quatro modelos da zen API em lockste
 - [x] #3 Code is reviewed by ponytail
 - [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
 - [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
-- [ ] #6 Branch merged to main with git merge --no-ff
+- [x] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -54,3 +54,9 @@ Smoke test do caminho default (o que a GMC-025 não cobriu, já que a avaliaçã
 
 Observação para follow-up: o preâmbulo meta previsto na GMC-025 apareceu no smoke ("Aqui está a análise da transcrição parcial:"). É cosmético e vive na UI; tratável com uma linha no PROMPT.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+CLIS["go-qwen"].model passou de qwen3.7-plus para qwen3.8-flash, com as duas menções ao nome do modelo atualizadas em README.md:17 e docs/PRD.md:315. Motivo na GMC-025: o qwen3.7-plus era o único dos quatro modelos avaliados com fabricação verificada por grep contra a transcrição ("Bucket S3" onde só se diz "bucket"), e ainda vazava resposta em inglês. Verificação: biome 0 erros, 18/18 testes passando (os testes do caminho go-qwen montam o próprio llm e afirmam o pass-through do model id, então não dependiam do nome antigo), e smoke test do caminho default — node server.js go-qwen, POST de legenda 204, /state com análise gerada — que é o que a GMC-025 não cobria por ter usado lançador com llm injetado. Fica pendente o preâmbulo meta do modelo na saída, cosmético e tratável no PROMPT.
+<!-- SECTION:FINAL_SUMMARY:END -->
