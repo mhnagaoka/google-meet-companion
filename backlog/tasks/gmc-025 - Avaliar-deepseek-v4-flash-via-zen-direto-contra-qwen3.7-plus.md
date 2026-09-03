@@ -3,7 +3,7 @@ id: GMC-025
 title: >-
   Avaliar deepseek-v4-flash, mimo-v2.5 e qwen3.8-flash contra qwen3.7-plus via
   zen direto
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-09-03 12:19'
@@ -37,7 +37,7 @@ A estratégia go-qwen (GMC-018) está fixada em qwen3.7-plus, escolhida sem comp
 - [x] #3 Code is reviewed by ponytail
 - [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
 - [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
-- [ ] #6 Branch merged to main with git merge --no-ff
+- [x] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -107,3 +107,9 @@ DoD1/DoD2: npx biome check . => 11 arquivos, 0 erros (3 infos preexistentes); np
 DoD3: não havia código de repo para revisar — o único código escrito foi um lançador descartável de 10 linhas no scratchpad, que existe justamente para não tocar em CLIS.
 DoD4: sem desvio de PRD/docs; dev/README.md já descreve o replay corretamente, inclusive a ressalva do relógio de replay nos tempos por tópico.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Rodou o transcript real de 2026-07-10 (692 legendas filtradas, replay a 500ms) por quatro modelos da zen API em paralelo e em lockstep — deepseek-v4-flash, mimo-v2.5, qwen3.8-flash e qwen3.7-plus (controle) — via lançador descartável no scratchpad, sem tocar em CLIS. Três análises distintas por rodada (checksums no ticks.log), então injeção da análise anterior e seção 6 foram exercitadas nas quatro. As afirmações distintivas foram conferidas por grep contra a transcrição, não por fluência: qwen3.8-flash cobriu mais matéria real (churn enterprise TM/XP, Eval/Golden Set, Mi off/banco de horas) sem fabricar nada nos itens checados; qwen3.7-plus, o modelo hoje fixado, é o único com fabricação verificada ("Bucket S3" onde a transcrição só diz "bucket") e ainda vazou uma pergunta em inglês, embora seja o único a reconciliar "Damari" -> Mariana; deepseek-v4-flash manteve a qualidade da GMC-010 pela via de API direta mas perdeu a linha de Eval; mimo-v2.5 foi o mais fraco, repassando lixo do ASR sem reconstruir. Recomendação registrada: trocar CLIS["go-qwen"].model para qwen3.8-flash, com as ressalvas de n=1, latência/custo não medidos (GMC-019) e adjudicação final do usuário. Sem mudança de código no repo: biome 0 erros e 18/18 testes na baseline intacta; nada de reunião entrou no git (meetings/ é gitignored, git status limpo).
+<!-- SECTION:FINAL_SUMMARY:END -->
