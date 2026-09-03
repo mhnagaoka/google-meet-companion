@@ -4,7 +4,7 @@ title: Add x-opencode-session header to go-qwen requests
 status: In Progress
 assignee: []
 created_date: '2026-09-03 11:40'
-updated_date: '2026-09-03 11:41'
+updated_date: '2026-09-03 11:42'
 labels: []
 dependencies: []
 references:
@@ -21,17 +21,17 @@ OpenCode Go announced (2026-09-03) that API requests must carry an x-opencode-se
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The go-qwen fetch call to llm.url sends x-opencode-session: <meeting id> on every request
-- [ ] #2 Session id is stable per meeting across analysis ticks and server restarts (it is the meeting id, not a random uuid)
-- [ ] #3 Tests assert the header is present on outbound go-qwen requests
+- [x] #1 The go-qwen fetch call to llm.url sends x-opencode-session: <meeting id> on every request
+- [x] #2 Session id is stable per meeting across analysis ticks and server restarts (it is the meeting id, not a random uuid)
+- [x] #3 Tests assert the header is present on outbound go-qwen requests
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No linting errors
-- [ ] #2 All unit tests passing
-- [ ] #3 Code is reviewed by ponytail
-- [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
+- [x] #1 No linting errors
+- [x] #2 All unit tests passing
+- [x] #3 Code is reviewed by ponytail
+- [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
 - [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
