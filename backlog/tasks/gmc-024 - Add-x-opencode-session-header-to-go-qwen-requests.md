@@ -1,9 +1,10 @@
 ---
 id: GMC-024
 title: Add x-opencode-session header to go-qwen requests
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-09-03 11:40'
+updated_date: '2026-09-03 11:41'
 labels: []
 dependencies: []
 references:
@@ -34,3 +35,9 @@ OpenCode Go announced (2026-09-03) that API requests must carry an x-opencode-se
 - [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Add 'x-opencode-session': s.id to the fetch headers in analyze() (server.js). 2. Test: inject an llm.url strategy via createApp whose server asserts the header, assert the value equals the meeting id.
+<!-- SECTION:PLAN:END -->

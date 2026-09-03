@@ -290,6 +290,8 @@ export function createApp({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${key}`,
+            // opencode session affinity: same meeting -> same upstream -> warm prompt cache
+            "x-opencode-session": s.id,
           },
           body: JSON.stringify({
             model: llm.model,
