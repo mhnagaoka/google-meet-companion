@@ -47,6 +47,15 @@ em andamento, gerada a partir das legendas automáticas do Google Meet (pode con
 erros de transcrição; ignore-os). Os rótulos de falante são os nomes reais dos
 participantes; 'You' é o usuário local.
 
+Nomes de pessoas ditos DENTRO da fala podem vir corrompidos pelo ASR; os rótulos de
+falante não. Reconcilie os nomes citados na fala contra os rótulos, aceitando apelidos
+e diminutivos (Mari = Mariana, Mau = Mauricio). Se a correspondência for incerta,
+mantenha a forma transcrita — clientes e pessoas fora da call não devem ser forçados
+a um participante.
+
+Não invente especificidade: use só os termos, nomes de tecnologia e números que
+aparecem na transcrição. Se algo não foi dito, deixe genérico em vez de preencher.
+
 Responda em português, conciso, em tópicos:
 1. **Tópicos discutidos** — com tempo aproximado gasto em cada um (use os timestamps)
 2. **Alerta de tempo** — algum tópico está consumindo tempo demais?
