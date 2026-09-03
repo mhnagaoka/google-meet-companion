@@ -482,6 +482,7 @@ test("go-qwen fetch path calls zen endpoint and writes analysis.txt", async () =
 
     assert.equal((await state()).analysis, "mocked zen analysis")
     assert.equal(received.headers.authorization, `Bearer ${key}`)
+    assert.equal(received.headers["x-opencode-session"], ID1)
     assert.equal(received.body.model, "qwen3.7-plus")
     assert.deepEqual(received.body.thinking, { type: "disabled" })
     assert.equal(received.body.messages[0].role, "user")
