@@ -1,9 +1,10 @@
 ---
 id: GMC-024
 title: Add x-opencode-session header to go-qwen requests
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-09-03 11:40'
+updated_date: '2026-09-03 11:40'
 labels: []
 dependencies: []
 references:
