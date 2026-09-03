@@ -1,11 +1,11 @@
 ---
 id: GMC-011
 title: Reconcile mis-transcribed names in the analysis prompt
-status: In Progress
+status: Done
 assignee:
   - '@claude'
 created_date: '2026-07-12 14:55'
-updated_date: '2026-09-03 13:05'
+updated_date: '2026-09-03 13:06'
 labels: []
 dependencies: []
 references:
@@ -34,7 +34,7 @@ GMC-010's real-transcript evaluation showed Meet's ASR corrupts person names ins
 - [x] #3 Code is reviewed by ponytail
 - [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
 - [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
-- [ ] #6 Branch merged to main with git merge --no-ff
+- [x] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
 
 ## Implementation Plan
@@ -78,3 +78,13 @@ Natureza da evidência: AC #2 e #4 são comportamentais, não automatizáveis �
 
 Qualidade geral não regrediu: as 6 seções continuam bem formadas nas duas saídas de tratamento (trt-clau com 4 tópicos cronometrados, 3 pontas soltas, 7 ações, 5 perguntas).
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Duas instruções adicionadas ao PROMPT (server.js, +9 linhas, nenhum código novo): (a) nomes ditos dentro da fala podem estar corrompidos pelo ASR enquanto os rótulos de falante não, então reconcilie-os contra os rótulos aceitando apelidos/diminutivos, mantendo a forma transcrita quando a correspondência for incerta (para não forçar clientes e pessoas de fora da call em cima de um participante); (b) não inventar especificidade — só termos, tecnologias e números presentes na transcrição.
+
+Verificação: controle x tratamento sobre as mesmas 692 linhas da transcrição real da GMC-010 via frozen-prefix, um tick por rodada, 2 backends (go-qwen/qwen3.8-flash e claude/sonnet-low), controle rodando o server.js da main num git worktree. 'Damari' caiu de 3 ocorrências para 0 nos DOIS backends, resolvido para o par certo (PR da Mariana / projeto Dark) — AC #2. 'Mal' não aparece em nenhuma saída e os itens correspondentes vão para Mauricio nas 4 rodadas, mas isso já valia no controle, então o ganho medido está no 'Damari'. Nenhum 'S3' em nenhuma rodada (AC #4), e a fabricação da GMC-010 reapareceu noutra forma e foi barrada: o controle go-qwen escreveu 'banco de dados' (ausente da transcrição) onde o tratamento escreveu 'Jeff cuidando do banco', ambos tokens literais da fala. AC #1 e #3 são estáticos, provados pelo diff. AC #2 e #4 são comportamentais: n=2 backends, não-determinístico, governados por prompt — podem regredir sem nenhum teste ficar vermelho.
+
+Biome check limpo em server.js, 18/18 testes passando (nenhum precisou mudar: a alteração é conteúdo de string, não estrutura). Nada de reunião entrou no git — harness e saídas ficaram no scratchpad.
+<!-- SECTION:FINAL_SUMMARY:END -->
