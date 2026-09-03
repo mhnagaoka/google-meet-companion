@@ -7,7 +7,7 @@ status: In Progress
 assignee:
   - '@claude'
 created_date: '2026-09-03 12:19'
-updated_date: '2026-09-03 12:33'
+updated_date: '2026-09-03 12:34'
 labels: []
 dependencies: []
 references:
@@ -23,11 +23,11 @@ A estratégia go-qwen (GMC-018) está fixada em qwen3.7-plus, escolhida sem comp
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 As quatro rodadas usam o mesmo transcript filtrado e a mesma cadência de análise, mudando apenas o model id da zen API
-- [ ] #2 Cada rodada completa pelo menos duas análises, exercitando injeção da análise anterior e a seção 6
-- [ ] #3 As análises são avaliadas contra as seis seções do PROMPT e as diferenças ficam registradas nas notas da task
-- [ ] #4 A recomendação sobre manter ou trocar o model id de CLIS['go-qwen'] fica explícita nas notas
-- [ ] #5 Nem o transcript nem os artefatos de reunião entram no git
+- [x] #1 As quatro rodadas usam o mesmo transcript filtrado e a mesma cadência de análise, mudando apenas o model id da zen API
+- [x] #2 Cada rodada completa pelo menos duas análises, exercitando injeção da análise anterior e a seção 6
+- [x] #3 As análises são avaliadas contra as seis seções do PROMPT e as diferenças ficam registradas nas notas da task
+- [x] #4 A recomendação sobre manter ou trocar o model id de CLIS['go-qwen'] fica explícita nas notas
+- [x] #5 Nem o transcript nem os artefatos de reunião entram no git
 <!-- AC:END -->
 
 ## Definition of Done
@@ -97,4 +97,13 @@ Trocar CLIS["go-qwen"].model de "qwen3.7-plus" para "qwen3.8-flash". O modelo at
 Ressalvas: (a) n=1 por modelo, saída não-determinística; (b) a única vantagem clara do qwen3.7-plus é reconciliar nomes, e isso é alvo da GMC-011, que é trabalho de prompt e beneficiaria os quatro modelos; (c) latência e custo não foram medidos — GMC-019 continua To Do e é o que fecharia a comparação; (d) a adjudicação final é do usuário, que participou da reunião.
 
 Desdobramentos sugeridos (não criados): task para a troca do model id em CLIS (mudança de código, precisa de task própria); linha no PROMPT contra preâmbulo meta ("responda direto, sem frase de abertura").
+
+=== Evidência por AC ===
+AC1: corpo do transcript.txt idêntico nas quatro rodadas — md5 b286a4a4 nas quatro após remover o header (que carrega o meet code) e os timestamps por linha; as quatro receberam o mesmo captions.txt de 692 linhas com o mesmo delay de 500ms, e o launch.js só varia no argumento model.
+AC2: 3 checksums distintos de analysis.txt por rodada no ticks.log (dsf d6f0e98a/091038bb/cba1b523; mim 18d7c78f/a585d3cf/e147d937; qwf 42988a42/e15f77cb/ec85803f; qwp 268bb8f9/cae128ad/e0db200b) — três análises => a segunda e a terceira rodaram com PRIOR injetado, e as quatro produziram seção 6 com conteúdo.
+AC3/AC4: notas acima, com as afirmações distintivas conferidas por grep contra captions.txt (linhas citadas) em vez de julgadas por fluência.
+AC5: git status --porcelain vazio ao fim da execução; meetings/ está no .gitignore e o transcript nunca saiu de ~/Downloads e do scratchpad da sessão.
+DoD1/DoD2: npx biome check . => 11 arquivos, 0 erros (3 infos preexistentes); npm test => 18/18 passando. Nenhum arquivo do repo foi alterado nesta task, então ambos medem a baseline intacta.
+DoD3: não havia código de repo para revisar — o único código escrito foi um lançador descartável de 10 linhas no scratchpad, que existe justamente para não tocar em CLIS.
+DoD4: sem desvio de PRD/docs; dev/README.md já descreve o replay corretamente, inclusive a ressalva do relógio de replay nos tempos por tópico.
 <!-- SECTION:NOTES:END -->
