@@ -1,9 +1,11 @@
 ---
 id: GMC-025
 title: Avaliar deepseek-v4-flash via zen direto contra qwen3.7-plus
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@claude'
 created_date: '2026-09-03 12:19'
+updated_date: '2026-09-03 12:20'
 labels: []
 dependencies: []
 references:
@@ -35,3 +37,15 @@ A estratégia go-qwen (GMC-018) está fixada em qwen3.7-plus, escolhida sem comp
 - [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Filtrar o export: só linhas 'Speaker: text' vão para o scratchpad (descarta título/participantes), mesmo pré-processamento da GMC-010
+2. Lançador descartável 'node -e' que chama createApp com { llm: { url, model, thinking } }, variando só o model id — sem tocar em CLIS
+3. Rodada A: deepseek-v4-flash, meet code dsf-appd-ily, ANALYZE_EVERY=120, servidor em background com log no scratchpad
+4. node dev/replay.js <filtrado> dsf-appd-ily 500 (~700 linhas => ~6 min => 3-4 ticks); checksum de analysis.txt a cada 20s para evidenciar ticks distintos
+5. Rodada B: idêntica com qwen3.7-plus (controle), meet code q37-appd-ily, porta separada ou sequencial
+6. Comparar as duas análises finais contra as seis seções do PROMPT; registrar diferenças e recomendação sobre CLIS['go-qwen'] nas notas
+7. Sem mudança de código: DoD de branch/merge fica N/A como na GMC-010
+<!-- SECTION:PLAN:END -->
