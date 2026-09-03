@@ -31,7 +31,7 @@ GMC-010's real-transcript evaluation showed Meet's ASR corrupts person names ins
 <!-- DOD:BEGIN -->
 - [x] #1 No linting errors
 - [x] #2 All unit tests passing
-- [ ] #3 Code is reviewed by ponytail
+- [x] #3 Code is reviewed by ponytail
 - [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
 - [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
