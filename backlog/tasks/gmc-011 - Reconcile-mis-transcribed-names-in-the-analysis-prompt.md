@@ -21,19 +21,19 @@ GMC-010's real-transcript evaluation showed Meet's ASR corrupts person names ins
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 PROMPT instructs the model that names inside speech may be ASR-corrupted and should be reconciled against speaker-label names, with an uncertainty escape hatch
-- [ ] #2 Re-running the analysis over the GMC-010 transcript resolves 'Damari' to Mariana and 'Mal' to Mauricio in the output
-- [ ] #3 PROMPT instructs the model not to invent specifics absent from the transcript (GMC-010 round 2: DeepSeek fabricated 'S3' for a GCS bucket and 'banco de dados' for the new production environment)
-- [ ] #4 Re-running over the GMC-010 transcript produces no fabricated technology names (no 'S3')
+- [x] #1 PROMPT instructs the model that names inside speech may be ASR-corrupted and should be reconciled against speaker-label names, with an uncertainty escape hatch
+- [x] #2 Re-running the analysis over the GMC-010 transcript resolves 'Damari' to Mariana and 'Mal' to Mauricio in the output
+- [x] #3 PROMPT instructs the model not to invent specifics absent from the transcript (GMC-010 round 2: DeepSeek fabricated 'S3' for a GCS bucket and 'banco de dados' for the new production environment)
+- [x] #4 Re-running over the GMC-010 transcript produces no fabricated technology names (no 'S3')
 <!-- AC:END -->
 
 ## Definition of Done
 <!-- DOD:BEGIN -->
-- [ ] #1 No linting errors
-- [ ] #2 All unit tests passing
+- [x] #1 No linting errors
+- [x] #2 All unit tests passing
 - [ ] #3 Code is reviewed by ponytail
-- [ ] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
-- [ ] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
+- [x] #4 PRD and docs updated if the implementation deviated from them (or the deviation reverted)
+- [x] #5 Changes are committed on a branch named after the task id (e.g. gmc-999)
 - [ ] #6 Branch merged to main with git merge --no-ff
 <!-- DOD:END -->
 
